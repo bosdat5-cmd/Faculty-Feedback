@@ -101,22 +101,57 @@
   const emailInput = document.getElementById("emailId");
   const daySelect = document.getElementById("daySelect");
 
-  // Add event listener when Day is selected
+  // Flag to track if Day is locked
+  let isDayLocked = false;
+
   daySelect.addEventListener("change", () => {
     const selectedDay = daySelect.value;
 
-    // Fix the email required for Day 1 and Day 2
+    if (!selectedDay) return; // Do nothing if no day selected
+
+    // Make email mandatory for Day 1 and Day 2
     if (selectedDay === "Day 1" || selectedDay === "Day 2") {
-      emailInput.required = true;  // Make mandatory
+      emailInput.required = true;
     } else {
-      emailInput.required = false; // Optional
+      emailInput.required = false;
     }
 
-    // Disable the Day select so user cannot change it until page refresh
-    if (selectedDay) {
+    // Lock the day selection
+    if (!isDayLocked) {
       daySelect.disabled = true;
+      isDayLocked = true;
     }
   });
+
+  // Modify submitForm to retain locked Day for all SRNs
+  function submitForm() {
+    const selectedSRN = document.getElementById("uniqueKeySelect").value;
+    if (!selectedSRN) {
+      alert("Please select an SRN before submitting feedback!");
+      return;
+    }
+
+    // Remove submitted SRN
+    srnListGlobal = srnListGlobal.filter(srn => srn !== selectedSRN);
+    populateSRNDropdown();
+
+    // Reset feedback ratings
+    document.querySelectorAll("#questionsContainer select").forEach(sel => sel.value = "");
+
+    if (srnListGlobal.length > 0) {
+      // Keep Day locked, go back to SRN selection
+      document.getElementById("page" + currentPage).classList.remove("active-page");
+      currentPage = 2; // Page 2: Day & SRN selection
+      document.getElementById("page" + currentPage).classList.add("active-page");
+      alert(`✅ Feedback submitted for SRN: ${selectedSRN}. Please select the next SRN.`);
+    } else {
+      // All SRNs done → Thank You page
+      document.getElementById("page" + currentPage).classList.remove("active-page");
+      currentPage = 4;
+      document.getElementById("page" + currentPage).classList.add("active-page");
+      showDailyQuote();
+    }
+  }
 </script>
 
   <div class="container">
@@ -335,6 +370,7 @@ function submitForm() {
 </script>
 </body>
 </html>
+
 
 
 
