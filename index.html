@@ -327,51 +327,45 @@
   }
 
   // ✅ Submit Day & SRN (Page 2)
-  function submitForm() {
-    const day = document.getElementById("daySelect").value;
-    const srn = document.getElementById("uniqueKeySelect").value;
+function submitForm() {
+  const day = document.getElementById("daySelect").value;
+  const srn = document.getElementById("srnSelect").value;
+  const email = document.getElementById("emailId").value;
 
-    if (!day || !srn) {
-      alert("⚠ Please select both Day and SRN before submitting.");
-      return;
-    }
-
-// ✅ Restrict email to max 2 days
-const email = document.getElementById("emailId").value;
-if (!email) {
-  alert("⚠ Email is mandatory!");
-  return;
-}
-
-// Initialize tracking for this email
-let emailData = JSON.parse(localStorage.getItem(email)) || { completedDays: [] };
-
-// If already 2 days done → block
-if (emailData.completedDays.length >= 2) {
-  alert("⚠ This email has already submitted feedback for 2 days.");
-  return;
-}
-
-// If day already submitted → block
-if (emailData.completedDays.includes(day)) {
-  alert(`⚠ You already submitted feedback for ${day} with this email.`);
-  return;
-}
-    // Freeze the selected day (esp. Day 1)
-    if (!usedDays.includes(day)) {
-      usedDays.push(day);
-      const daySelect = document.getElementById("daySelect");
-      for (let opt of daySelect.options) {
-        if (opt.value === day) opt.disabled = true;
-      }
-    }
-
-    // Save current SRN temporarily until feedback is submitted
-    sessionStorage.setItem("currentSRN", srn);
-
-    // Go to Feedback Questions Page
-    nextPage();
+  if (!email) {
+    alert("⚠ Email is mandatory!");
+    return;
   }
+
+  // ✅ Track days per email
+  let emailData = JSON.parse(localStorage.getItem(email)) || { completedDays: [] };
+
+  // If already 2 days completed → block
+  if (emailData.completedDays.length >= 2) {
+    alert("⚠ This email has already submitted feedback for 2 days.");
+    return;
+  }
+
+  // If this day already done → block
+  if (emailData.completedDays.includes(day)) {
+    alert(`⚠ You already submitted feedback for ${day} with this email.`);
+    return;
+  }
+
+  // Save chosen day + srn
+  sessionStorage.setItem("selectedDay", day);
+  sessionStorage.setItem("selectedSRN", srn);
+
+  // ✅ Disable only the chosen option, NOT the whole dropdown
+  let daySelect = document.getElementById("daySelect");
+  for (let opt of daySelect.options) {
+    if (opt.value === day) {
+      opt.disabled = true;
+    }
+  }
+
+  nextPage();
+}
 
   // ✅ After feedback → Submit with loading
   function finalizeGrade() {
@@ -425,5 +419,6 @@ if (emailData.completedDays.includes(day)) {
   }, 1000);
 }
 </script>
+
 
 
