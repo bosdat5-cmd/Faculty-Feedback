@@ -1,99 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>THE INSTITUTE OF CHARTERED ACCOUNTANTS OF INDIA</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Faculty Feedback Form</title>
+  <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    body {
-      font-family: 'Poppins', sans-serif;
-      background: linear-gradient(135deg, #0077b6, #00b4d8);
-      margin: 0;
-      padding: 0;
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      min-height: 100vh;
-    }
-    .container {
-      background: #fff;
-      margin-top: 40px;
-      padding: 30px;
-      border-radius: 15px;
-      width: 500px;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.15);
-      animation: fadeIn 0.5s ease-in-out;
-    }
-    h2 {
-      text-align: center;
-      color: #023e8a;
-      margin-bottom: 20px;
-      font-weight: 600;
-    }
-    h3 {
-      color: #0077b6;
-      margin-bottom: 15px;
-    }
-    label {
-      font-weight: 500;
-      display: block;
-      margin: 8px 0 5px;
-      color: #333;
-    }
-    input, select {
-      width: 100%;
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 10px;
-      outline: none;
-      font-size: 14px;
-      margin-bottom: 15px;
-      transition: all 0.3s;
-    }
-    input:focus, select:focus {
-      border-color: #00b4d8;
-      box-shadow: 0 0 6px rgba(0,180,216,0.5);
-    }
-    .btn {
-      display: inline-block;
-      background: #0077b6;
-      color: #fff;
-      border: none;
-      border-radius: 10px;
-      padding: 10px 18px;
-      font-size: 14px;
-      font-weight: 500;
-      cursor: pointer;
-      margin: 5px 5px 0 0;
-      transition: all 0.3s;
-    }
-    .btn:hover {
-      background: #023e8a;
-      transform: scale(1.05);
-    }
+    body { font-family: Arial, sans-serif; background: #f0ebf8; }
+    .container { max-width: 700px; margin: auto; padding: 20px; background: white; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
     .form-page { display: none; }
     .active-page { display: block; }
-    .quote-box {
-      background: #f1faff;
-      padding: 20px;
-      border-left: 5px solid #00b4d8;
-      margin-top: 20px;
-      border-radius: 10px;
-      font-style: italic;
-      color: #333;
-    }
-    .thankyou {
-      text-align: center;
-      color: #023e8a;
-      font-size: 18px;
-      font-weight: 600;
-      margin-top: 10px;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+    .btn { margin-top: 15px; padding: 10px 20px; background: #0077b6; color: white; border: none; border-radius: 6px; cursor: pointer; }
+    .btn:hover { background: #023e8a; }
   </style>
 </head>
 <body>
@@ -148,28 +66,81 @@
       </select>
 
       <button class="btn" onclick="prevPage()">⬅ Back</button>
-      <button class="btn" onclick="submitForm()">✅ Submit</button>
+      <button class="btn" onclick="startFeedback()">✅ Submit</button>
     </div>
 
-<!-- ================= PAGE 3: FEEDBACK QUESTIONS ================= -->
-<div class="form-page" id="page3">
-  <h2 class="text-xl font-semibold mb-4 text-center">Feedback Questions</h2>
+    <!-- Page 3: Feedback Questions -->
+    <div class="form-page" id="page3">
+      <h2 class="text-xl font-semibold mb-4 text-center">Feedback Questions</h2>
+      <div id="questionsContainer" class="space-y-4"></div>
 
-  <div id="questionsContainer" class="space-y-4"></div>
+      <div id="resultBox" class="mt-6 p-4 border rounded bg-gray-100">
+        <p class="text-lg font-semibold">Weightage Score: <span id="finalScore">0</span></p>
+        <p class="text-lg font-semibold">Grade: <span id="finalGrade">-</span></p>
+      </div>
 
-  <!-- Result will show here -->
-  <div id="resultBox" class="mt-6 p-4 border rounded bg-gray-100">
-    <p class="text-lg font-semibold">Weightage Score: <span id="finalScore">0</span></p>
-    <p class="text-lg font-semibold">Grade: <span id="finalGrade">-</span></p>
+      <div class="flex justify-between mt-6">
+        <button type="button" onclick="prevPage()" class="bg-gray-500 text-white px-4 py-2 rounded">Back</button>
+        <button type="button" onclick="finalizeGrade()" id="submitBtn" class="bg-blue-600 text-white px-4 py-2 rounded">Submit</button>
+      </div>
+    </div>
+
+    <!-- Page 4: Thank You -->
+    <div class="form-page" id="page4">
+      <div class="text-center p-6">
+        <h2 class="text-2xl font-bold mb-4">Thank You!</h2>
+        <p class="text-lg mb-6">Your feedback has been successfully submitted.</p>
+        <div class="bg-white shadow-md rounded-lg p-6 max-w-xl mx-auto mt-6">
+          <h3 class="text-xl font-semibold mb-2">✨ Daily Motivational Quote ✨</h3>
+          <p id="dailyQuote" class="italic text-gray-700"></p>
+        </div>
+      </div>
+    </div>
   </div>
-
-  <div class="flex justify-between mt-6">
-    <button type="button" onclick="prevPage()" class="bg-gray-500 text-white px-4 py-2 rounded">Back</button>
-    <button type="button" onclick="finalizeGrade()" id="submitBtn" class="bg-blue-600 text-white px-4 py-2 rounded">Submit</button>
-  </div>
-</div>
 
 <script>
+  let currentPage = 1;
+  let selectedDay = null;
+  let usedKeys = [];
+  let studentKeys = ["SRN001","SRN002","SRN003"]; // Example keys
+
+  function showPage(pageNum) {
+    document.querySelectorAll(".form-page").forEach(p => p.classList.remove("active-page"));
+    document.getElementById("page" + pageNum).classList.add("active-page");
+    currentPage = pageNum;
+  }
+  function nextPage(){ showPage(currentPage+1); }
+  function prevPage(){ showPage(currentPage-1); }
+
+  // Populate SRNs
+  function handleFileUpload(event) {
+    let select = document.getElementById("uniqueKeySelect");
+    select.innerHTML = `<option value="">-- Select SRN --</option>`;
+    studentKeys.forEach(k => {
+      let opt = document.createElement("option");
+      opt.value = k; opt.textContent = k;
+      select.appendChild(opt);
+    });
+  }
+
+  // Freeze Day selection after first choice
+  document.getElementById("daySelect").addEventListener("change", function() {
+    if (!selectedDay) {
+      selectedDay = this.value;
+      this.disabled = true;
+    }
+  });
+
+  // Start Feedback for a student
+  function startFeedback() {
+    let srn = document.getElementById("uniqueKeySelect").value;
+    if (!srn) { alert("Select a student SRN first!"); return; }
+    if (usedKeys.includes(srn)) { alert("This SRN already submitted!"); return; }
+
+    nextPage();
+  }
+
+  // Feedback Questions
   const questions = [
     "Subject knowledge","Session planning & structure","Communication skills",
     "Engagement & interaction","Innovative methods","Time management",
@@ -180,215 +151,65 @@
 
   function renderQuestions() {
     const container = document.getElementById("questionsContainer");
-    questions.forEach((q, i) => {
-      const block = document.createElement("div");
+    questions.forEach((q,i) => {
+      let block = document.createElement("div");
       block.innerHTML = `
         <label class="block mb-2">${i+1}. ${q}</label>
-        <select name="q${i+1}" class="ratingSelect w-full p-2 border rounded" required>
+        <select class="ratingSelect w-full p-2 border rounded">
           <option value="">-- Select Rating --</option>
-          <option value="20">1 - Poor (20)</option>
-          <option value="40">2 - Below Average (40)</option>
-          <option value="60">3 - Average (60)</option>
-          <option value="80">4 - Good (80)</option>
-          <option value="100">5 - Excellent (100)</option>
-        </select>
-      `;
+          <option value="20">1 - Poor</option>
+          <option value="40">2 - Below Average</option>
+          <option value="60">3 - Average</option>
+          <option value="80">4 - Good</option>
+          <option value="100">5 - Excellent</option>
+        </select>`;
       container.appendChild(block);
     });
-
-    // Attach live update listener
-    document.querySelectorAll(".ratingSelect").forEach(sel => {
+    document.querySelectorAll(".ratingSelect").forEach(sel=>{
       sel.addEventListener("change", updateLiveScore);
     });
   }
   document.addEventListener("DOMContentLoaded", renderQuestions);
 
-  function updateLiveScore() {
-    const selects = document.querySelectorAll("#questionsContainer select");
-    let total = 0, count = 0;
-    selects.forEach(sel => {
-      if (sel.value) {
-        total += parseInt(sel.value);
-        count++;
+  function updateLiveScore(){
+    let selects=document.querySelectorAll(".ratingSelect");
+    let total=0,count=0;
+    selects.forEach(sel=>{ if(sel.value){ total+=parseInt(sel.value); count++; } });
+    let avg=count?total/count:0;
+    document.getElementById("finalScore").innerText=avg.toFixed(2);
+    let grade="-";
+    if(avg>=85) grade="A+"; else if(avg>=70) grade="A"; else if(avg>=50) grade="B+"; else if(avg>=30) grade="B"; else if(avg>0) grade="C";
+    document.getElementById("finalGrade").innerText=grade;
+  }
+
+  // Finalize Grade & Save
+  function finalizeGrade(){
+    let btn=document.getElementById("submitBtn");
+    btn.disabled=true;
+    btn.innerText="Submitting... ⏳";
+
+    setTimeout(()=>{
+      let srn=document.getElementById("uniqueKeySelect").value;
+      usedKeys.push(srn);
+
+      // Remove SRN from dropdown
+      let sel=document.getElementById("uniqueKeySelect");
+      sel.querySelector(`option[value="${srn}"]`).remove();
+
+      // Reset button
+      btn.disabled=false;
+      btn.innerText="Submit";
+
+      // If no keys left → Thank You
+      if(usedKeys.length===studentKeys.length){
+        showPage(4);
+        document.getElementById("dailyQuote").innerText="Keep learning, keep growing!";
+      } else {
+        // Go back to SRN select page for next student
+        showPage(2);
       }
-    });
-
-    const avg = count ? total / count : 0;
-    document.getElementById("finalScore").innerText = avg.toFixed(2);
-
-    let grade = "-";
-    if (avg >= 85) grade = "A+";
-    else if (avg >= 70) grade = "A";
-    else if (avg >= 50) grade = "B+";
-    else if (avg >= 30) grade = "B";
-    else if (avg > 0) grade = "C";
-
-    document.getElementById("finalGrade").innerText = grade;
-  }
-
-  function finalizeGrade() {
-    // When user clicks Submit → go to next page
-    nextPage();
+    },1500);
   }
 </script>
-
-<!-- ================= PAGE 4: THANK YOU ================= -->
-<div class="form-page" id="page4">
-  <div class="text-center p-6">
-    <h2 class="text-2xl font-bold mb-4">Thank You!</h2>
-    <p class="text-lg mb-6">Your feedback has been successfully submitted.</p>
-
-    <!-- Daily Motivational Quote -->
-    <div class="bg-white shadow-md rounded-lg p-6 max-w-xl mx-auto mt-6">
-      <h3 class="text-xl font-semibold mb-2">✨ Daily Motivational Quote ✨</h3>
-      <p id="dailyQuote" class="italic text-gray-700"></p>
-    </div>
-  </div>
-</div>
-
-<script>
-  const quotes = [
-    "Success is not final, failure is not fatal: it is the courage to continue that counts.",
-    "The best way to predict the future is to create it.",
-    "Dream big. Start small. Act now.",
-    "Believe you can and you're halfway there.",
-    "Push yourself, because no one else is going to do it for you.",
-    "Great things never come from comfort zones."
-  ];
-  function showDailyQuote() {
-    const today = new Date().getDate();
-    document.getElementById("dailyQuote").innerText = quotes[today % quotes.length];
-  }
-  document.addEventListener("DOMContentLoaded", showDailyQuote);
-</script>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-
-<script>
-  let currentPage = 1;
-  let availableSRNs = []; // store SRNs from Excel
-
-  // ✅ Page navigation
-  function nextPage() {
-    document.getElementById("page" + currentPage).classList.remove("active-page");
-    currentPage++;
-    document.getElementById("page" + currentPage).classList.add("active-page");
-  }
-
-  function prevPage() {
-    document.getElementById("page" + currentPage).classList.remove("active-page");
-    currentPage--;
-    document.getElementById("page" + currentPage).classList.add("active-page");
-  }
-
-  // ✅ Download Excel Template
-  function downloadTemplate() {
-    const wb = XLSX.utils.book_new();
-    const wsData = [["S.No", "SRN", "Name"]]; // Header row
-    const ws = XLSX.utils.aoa_to_sheet(wsData);
-    XLSX.utils.book_append_sheet(wb, ws, "Template");
-    XLSX.writeFile(wb, "Student_Template.xlsx");
-  }
-
-  // ✅ Handle Excel Upload
-  function handleFileUpload(event) {
-    const file = event.target.files[0];
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      const data = new Uint8Array(e.target.result);
-      const workbook = XLSX.read(data, { type: "array" });
-      const sheetName = workbook.SheetNames[0];
-      const sheet = workbook.Sheets[sheetName];
-      const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-
-      // Extract SRN column (2nd column)
-      availableSRNs = [];
-      for (let i = 1; i < jsonData.length; i++) {
-        if (jsonData[i][1]) availableSRNs.push(jsonData[i][1]);
-      }
-
-      populateSRNDropdown();
-      alert("✅ Student SRNs loaded successfully!");
-    };
-    reader.readAsArrayBuffer(file);
-  }
-
-  // ✅ Populate SRN dropdown
-  function populateSRNDropdown() {
-    const dropdown = document.getElementById("uniqueKeySelect");
-    dropdown.innerHTML = '<option value="">-- Select SRN --</option>';
-    availableSRNs.forEach(srn => {
-      const opt = document.createElement("option");
-      opt.value = srn;
-      opt.textContent = srn;
-      dropdown.appendChild(opt);
-    });
-  }
-
-  // ✅ Freeze Day selection once chosen
-  document.getElementById("daySelect").addEventListener("change", function() {
-    if (this.value !== "") {
-      this.disabled = true;
-      alert("✅ You selected " + this.value + ". It is now locked.");
-    }
-  });
-
-  // ✅ LocalStorage helpers for duplicate prevention
-  function hasSubmitted(email, day) {
-    let records = JSON.parse(localStorage.getItem("feedbackRecords") || "[]");
-    return records.some(r => r.email === email && r.day === day);
-  }
-
-  function saveSubmission(email, day) {
-    let records = JSON.parse(localStorage.getItem("feedbackRecords") || "[]");
-    records.push({ email: email, day: day });
-    localStorage.setItem("feedbackRecords", JSON.stringify(records));
-  }
-
-  // ✅ Submit and Show Thank You Page
-  function submitForm() {
-    const email = document.getElementById("emailId").value.trim();
-    const day = document.getElementById("daySelect").value;
-    const srn = document.getElementById("uniqueKeySelect").value;
-
-    if (!email || !day || !srn) {
-      alert("⚠ Please fill in Email, select Day, and SRN before submitting.");
-      return;
-    }
-
-    // Check duplicate
-    if (hasSubmitted(email, day)) {
-      alert("❌ You have already submitted feedback for " + day + " with this email.");
-      return;
-    }
-
-    // Save submission
-    saveSubmission(email, day);
-
-    // Remove SRN from list & refresh dropdown
-    availableSRNs = availableSRNs.filter(s => s !== srn);
-    populateSRNDropdown();
-
-    // Show Thank You Page
-    document.getElementById("page" + currentPage).classList.remove("active-page");
-    currentPage++;
-    document.getElementById("page" + currentPage).classList.add("active-page");
-
-    // Daily Motivational Quotes
-    const quotes = [
-      "Success is not final, failure is not fatal: it is the courage to continue that counts.",
-      "Believe you can and you're halfway there.",
-      "Don’t watch the clock; do what it does. Keep going.",
-      "Great things never come from comfort zones.",
-      "Push yourself, because no one else is going to do it for you.",
-      "Dream bigger. Do bigger.",
-      "Your limitation—it’s only your imagination.",
-      "Hard work beats talent when talent doesn’t work hard.",
-      "Don’t stop until you’re proud.",
-      "Doubt kills more dreams than failure ever will."
-    ];
-    const today = new Date();
-    const index = today.getDate() % quotes.length;
-    document.getElementById("dailyQuote").innerText = quotes[index];
-  }
-</script>
+</body>
+</html>
