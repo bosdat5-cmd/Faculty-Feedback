@@ -94,7 +94,7 @@ input:focus, select:focus { border-color:#00b4d8; box-shadow:0 0 6px rgba(0,180,
 <script>
 let currentPage = 1;
 let srnListGlobal = [];
-let lockedDay = ""; 
+let lockedDay = "";
 const questions = [
   "Subject knowledge","Session planning & structure","Communication skills",
   "Engagement & interaction","Innovative methods","Time management",
@@ -104,12 +104,12 @@ const questions = [
 ];
 
 // Render Questions
-function renderQuestions(){
+function renderQuestions() {
   const container = document.getElementById("questionsContainer");
-  container.innerHTML="";
-  questions.forEach((q,i)=>{
-    const block=document.createElement("div");
-    block.innerHTML=`<label>${i+1}. ${q}</label>
+  container.innerHTML = "";
+  questions.forEach((q, i) => {
+    const block = document.createElement("div");
+    block.innerHTML = `<label>${i+1}. ${q}</label>
     <select class="ratingSelect" required>
       <option value="">-- Select Rating --</option>
       <option value="20">1 - Poor (20)</option>
@@ -120,151 +120,149 @@ function renderQuestions(){
     </select>`;
     container.appendChild(block);
   });
-  document.querySelectorAll(".ratingSelect").forEach(sel=>sel.addEventListener("change",updateLiveScore));
+  document.querySelectorAll(".ratingSelect").forEach(sel => sel.addEventListener("change", updateLiveScore));
 }
 
 // Update live score
-function updateLiveScore(){
-  const selects=document.querySelectorAll(".ratingSelect");
-  let total=0,count=0;
-  selects.forEach(sel=>{if(sel.value){total+=parseInt(sel.value);count++;}});
-  const avg=count?total/count:0;
-  document.getElementById("finalScore").innerText=avg.toFixed(2);
-  let grade="-";
-  if(avg>=85) grade="A+"; else if(avg>=70) grade="A"; else if(avg>=50) grade="B+"; else if(avg>=30) grade="B"; else if(avg>0) grade="C";
-  document.getElementById("finalGrade").innerText=grade;
+function updateLiveScore() {
+  const selects = document.querySelectorAll(".ratingSelect");
+  let total = 0, count = 0;
+  selects.forEach(sel => { if(sel.value){ total += parseInt(sel.value); count++; }});
+  const avg = count ? total / count : 0;
+  document.getElementById("finalScore").innerText = avg.toFixed(2);
+  let grade = "-";
+  if(avg >= 85) grade="A+"; else if(avg >=70) grade="A"; else if(avg >=50) grade="B+"; else if(avg >=30) grade="B"; else if(avg>0) grade="C";
+  document.getElementById("finalGrade").innerText = grade;
 }
 
 // Navigation
-function nextPage(){
+function nextPage() {
   document.getElementById("page"+currentPage).classList.remove("active-page");
   currentPage++;
   document.getElementById("page"+currentPage).classList.add("active-page");
 }
-function prevPage(){ 
-  document.getElementById("page"+currentPage).classList.remove("active-page"); 
-  currentPage--; 
-  document.getElementById("page"+currentPage).classList.add("active-page"); 
+function prevPage() {
+  document.getElementById("page"+currentPage).classList.remove("active-page");
+  currentPage--;
+  document.getElementById("page"+currentPage).classList.add("active-page");
 }
 
 // Excel template
-function downloadTemplate(){ 
-  const wb=XLSX.utils.book_new(); 
-  const ws=XLSX.utils.aoa_to_sheet([["S.No","SRN","Name"]]); 
-  XLSX.utils.book_append_sheet(wb,ws,"Template"); 
+function downloadTemplate() {
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.aoa_to_sheet([["S.No","SRN","Name"]]);
+  XLSX.utils.book_append_sheet(wb, ws, "Template");
   XLSX.writeFile(wb,"Student_Template.xlsx");
 }
 
 // Handle file upload
-function handleFileUpload(event){
-  const file=event.target.files[0]; 
-  const reader=new FileReader();
-  reader.onload=function(e){
-    const data=new Uint8Array(e.target.result);
-    const workbook=XLSX.read(data,{type:"array"});
-    const sheet=workbook.Sheets[workbook.SheetNames[0]];
-    const jsonData=XLSX.utils.sheet_to_json(sheet,{header:1});
-    srnListGlobal=[];
-    for(let i=1;i<jsonData.length;i++) if(jsonData[i][1]) srnListGlobal.push(jsonData[i][1]);
+function handleFileUpload(event) {
+  const file = event.target.files[0];
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const data = new Uint8Array(e.target.result);
+    const workbook = XLSX.read(data,{type:"array"});
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+    const jsonData = XLSX.utils.sheet_to_json(sheet,{header:1});
+    srnListGlobal = [];
+    for(let i=1;i<jsonData.length;i++){
+      if(jsonData[i][1]){
+        srnListGlobal.push({ value: jsonData[i][1], completed: false });
+      }
+    }
     populateSRNDropdown();
     alert("✅ Student SRNs loaded!");
   }
   reader.readAsArrayBuffer(file);
 }
 
+// Populate SRN dropdown
 function populateSRNDropdown() {
   const dropdown = document.getElementById("uniqueKeySelect");
   dropdown.innerHTML = '<option value="">-- Select SRN --</option>';
-
   srnListGlobal.forEach(srn => {
-    // Only show SRNs that are not completed
-    if (!srn.completed) { 
+    if(!srn.completed){
       const opt = document.createElement("option");
-      opt.value = srn.value;   // srn.value = SRN number
+      opt.value = srn.value;
       opt.textContent = srn.value;
       dropdown.appendChild(opt);
     }
   });
 }
 
+// Submit feedback
 async function submitForm() {
   const selectedSRN = document.getElementById("uniqueKeySelect").value;
-  if (!selectedSRN) { alert("Select SRN"); return; }
+  if(!selectedSRN){ alert("Select SRN"); return; }
 
-  // Call backend to save feedback
   await fetch(`YOUR_WEB_APP_URL/submit?email=${encodeURIComponent(document.getElementById("emailId").value)}&day=${encodeURIComponent(lockedDay)}&srn=${encodeURIComponent(selectedSRN)}`);
 
-  // Mark this SRN as completed in srnListGlobal
-  srnListGlobal = srnListGlobal.map(srn => {
-    if (srn.value === selectedSRN) return { ...srn, completed: true };
-    return srn;
-  });
+  srnListGlobal = srnListGlobal.map(srn => srn.value === selectedSRN ? { ...srn, completed:true } : srn );
+  populateSRNDropdown();
 
-  populateSRNDropdown();  // Rebuild dropdown without completed SRNs
+  document.querySelectorAll(".ratingSelect").forEach(sel=>sel.value="");
 
-  // Clear ratings
-  document.querySelectorAll(".ratingSelect").forEach(sel => sel.value = "");
-
-  // If SRNs remain
-  if (srnListGlobal.some(s => !s.completed)) { 
-    document.getElementById("page" + currentPage).classList.remove("active-page");
+  if(srnListGlobal.some(s => !s.completed)) {
+    document.getElementById("page"+currentPage).classList.remove("active-page");
     currentPage = 2;
-    document.getElementById("page" + currentPage).classList.add("active-page");
-    alert(`✅ Feedback submitted for SRN: ${selectedSRN}.`);
+    document.getElementById("page"+currentPage).classList.add("active-page");
+    alert(`✅ Feedback submitted for SRN: ${selectedSRN}`);
   } else {
-    // All SRNs done
-    document.getElementById("page" + currentPage).classList.remove("active-page");
+    document.getElementById("page"+currentPage).classList.remove("active-page");
     currentPage = 4;
-    document.getElementById("page" + currentPage).classList.add("active-page");
+    document.getElementById("page"+currentPage).classList.add("active-page");
     showDailyQuote();
   }
 }
 
 // Daily Quote
-function showDailyQuote(){ 
-  const quotes=[
+function showDailyQuote() {
+  const quotes = [
     "Success is not final, failure is not fatal: it is the courage to continue that counts.",
     "The best way to predict the future is to create it.",
     "Dream big. Start small. Act now.",
     "Believe you can and you're halfway there.",
     "Push yourself, because no one else is going to do it for you.",
     "Great things never come from comfort zones."
-  ]; 
-  const today=new Date().getDate(); 
-  document.getElementById("dailyQuote").innerText=quotes[today%quotes.length];
+  ];
+  const today = new Date().getDate();
+  document.getElementById("dailyQuote").innerText = quotes[today%quotes.length];
 }
 
-// Populate Available Days based on Email
-async function populateAvailableDays(){
-  const email=document.getElementById("emailId").value.trim();
+// Populate Available Days
+async function populateAvailableDays() {
+  const email = document.getElementById("emailId").value.trim();
   if(!email){ alert("Enter Email first"); return; }
-  const resp=await fetch(`YOUR_WEB_APP_URL/getAvailableDays?email=${encodeURIComponent(email)}`);
-  const availableDays=await resp.json();
-  const daySelect=document.getElementById("lockDaySelect");
-  daySelect.innerHTML='<option value="">-- Select Day --</option>';
+
+  const resp = await fetch(`YOUR_WEB_APP_URL/getAvailableDays?email=${encodeURIComponent(email)}`);
+  const availableDays = await resp.json();
+
+  const daySelect = document.getElementById("lockDaySelect");
+  daySelect.innerHTML = '<option value="">-- Select Day --</option>';
   availableDays.forEach(day=>{
-    const opt=document.createElement("option");
-    opt.value=day;
-    opt.textContent=day;
+    const opt = document.createElement("option");
+    opt.value = day;
+    opt.textContent = day;
     daySelect.appendChild(opt);
   });
 }
 
-// Lock Selected Day and go to next page
-async function lockSelectedDay(){
-  const day=document.getElementById("lockDaySelect").value;
-  const email=document.getElementById("emailId").value.trim();
+// Lock Selected Day
+async function lockSelectedDay() {
+  const day = document.getElementById("lockDaySelect").value;
+  const email = document.getElementById("emailId").value.trim();
   if(!day){ alert("Select a day"); return; }
+
   await fetch(`YOUR_WEB_APP_URL/lockDay?email=${encodeURIComponent(email)}&day=${encodeURIComponent(day)}`);
-  lockedDay=day;
-  const dayDropdown=document.getElementById("daySelect");
-  dayDropdown.innerHTML=`<option>${lockedDay}</option>`;
-  dayDropdown.value=lockedDay;
+  lockedDay = day;
+
+  const dayDropdown = document.getElementById("daySelect");
+  dayDropdown.innerHTML = `<option>${lockedDay}</option>`;
+  dayDropdown.value = lockedDay;
   nextPage();
 }
 
-document.addEventListener("DOMContentLoaded",renderQuestions);
+document.addEventListener("DOMContentLoaded", renderQuestions);
 </script>
 </body>
 </html>
-
