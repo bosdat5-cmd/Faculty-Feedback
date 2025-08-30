@@ -97,6 +97,61 @@
   </style>
 </head>
 <body>
+
+<div class="container">
+
+  <!-- ✅ Page 1: Enter Email -->
+  <div id="page1" class="form-page active-page">
+    <h2>Student Feedback Form</h2>
+    <label for="emailId">Enter Email ID</label>
+    <input type="email" id="emailId" placeholder="Enter your email" required>
+    <button class="btn" onclick="saveEmail()">Next</button>
+  </div>
+
+  <!-- ✅ Page 2: Select Day & SRN -->
+  <div id="page2" class="form-page">
+    <h2>Select Day & SRN</h2>
+
+    <label for="daySelect">Select Day</label>
+    <select id="daySelect">
+      <option value="">-- Select Day --</option>
+      <option value="Day 1">Day 1</option>
+      <option value="Day 2">Day 2</option>
+      <option value="Day 3">Day 3</option>
+    </select>
+
+    <label for="srnSelect">Select SRN</label>
+    <select id="srnSelect">
+      <option value="">-- Select SRN --</option>
+    </select>
+
+    <input type="file" accept=".xlsx,.xls" onchange="handleFileUpload(event)" />
+    <button class="btn" onclick="downloadTemplate()">Download Template</button>
+    <br><br>
+    <button class="btn" onclick="goToPage(1)">Back</button>
+    <button class="btn" onclick="saveDaySRN()">Next</button>
+  </div>
+
+  <!-- ✅ Page 3: Submit Feedback -->
+  <div id="page3" class="form-page">
+    <h2>Submit Feedback</h2>
+    <div class="quote-box">
+      Please confirm your selection and submit your feedback.
+    </div>
+    <br>
+    <button id="submitBtn" class="btn" onclick="finalizeGrade()">Submit</button>
+    <button class="btn" onclick="goToPage(2)">Back</button>
+  </div>
+
+  <!-- ✅ Page 4: Thank You -->
+  <div id="page4" class="form-page">
+    <h2>Thank You 🎉</h2>
+    <p class="thankyou">Your feedback has been submitted successfully.</p>
+    <button class="btn" onclick="goToPage(1)">Start Again</button>
+  </div>
+
+</div>
+
 <script>
   let allSRNs = [];    // store original SRNs from Excel
   let usedSRNs = [];   // store submitted SRNs
@@ -129,7 +184,6 @@
       return;
     }
 
-    // Track completed days per email
     let emailData = JSON.parse(localStorage.getItem(email)) || { completedDays: [] };
 
     if (emailData.completedDays.length >= 2) {
@@ -141,7 +195,6 @@
       return;
     }
 
-    // Save to session
     sessionStorage.setItem("selectedDay", day);
     sessionStorage.setItem("selectedSRN", srn);
 
@@ -164,14 +217,12 @@
     submitBtn.disabled = true;
 
     setTimeout(() => {
-      // Save completed day for this email
       let emailData = JSON.parse(localStorage.getItem(email)) || { completedDays: [] };
       if (!emailData.completedDays.includes(day)) {
         emailData.completedDays.push(day);
         localStorage.setItem(email, JSON.stringify(emailData));
       }
 
-      // Remove SRN from dropdown
       const srnSelect = document.getElementById("srnSelect");
       for (let i = 0; i < srnSelect.options.length; i++) {
         if (srnSelect.options[i].value === srn) {
@@ -183,7 +234,6 @@
       submitBtn.innerHTML = "✅ Submitted";
       submitBtn.disabled = false;
 
-      // Next step
       if (srnSelect.options.length > 1) {
         goToPage(2);
       } else {
@@ -242,8 +292,5 @@
   }
 </script>
 
-
-
-
-
-
+</body>
+</html>
