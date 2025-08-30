@@ -266,6 +266,7 @@
   let currentPage = 1;
   let usedSRNs = [];   // store submitted student keys
   let usedDays = [];   // store submitted days
+  let allSRNs = [];    // store original SRNs from Excel
 
   function nextPage() {
     document.getElementById("page" + currentPage).classList.remove("active-page");
@@ -300,22 +301,22 @@
       const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 
       // Extract SRN column (2nd column)
-      let srnList = [];
+      allSRNs = [];
       for (let i = 1; i < jsonData.length; i++) {
-        if (jsonData[i][1]) srnList.push(jsonData[i][1]);
+        if (jsonData[i][1]) allSRNs.push(jsonData[i][1]);
       }
 
-      populateSRNDropdown(srnList);
+      populateSRNDropdown();
       alert("✅ Student SRNs loaded successfully!");
     };
     reader.readAsArrayBuffer(file);
   }
 
   // ✅ Populate SRN Dropdown excluding already used
-  function populateSRNDropdown(srnList) {
+  function populateSRNDropdown() {
     const dropdown = document.getElementById("uniqueKeySelect");
     dropdown.innerHTML = '<option value="">-- Select SRN --</option>';
-    srnList.forEach(srn => {
+    allSRNs.forEach(srn => {
       if (!usedSRNs.includes(srn)) {
         const opt = document.createElement("option");
         opt.value = srn;
@@ -325,7 +326,7 @@
     });
   }
 
-  // ✅ Submit and Loop Students
+  // ✅ Submit Day & SRN (Page 2)
   function submitForm() {
     const day = document.getElementById("daySelect").value;
     const srn = document.getElementById("uniqueKeySelect").value;
@@ -344,27 +345,44 @@
       }
     }
 
-    // Remove SRN from future selection
-    usedSRNs.push(srn);
-    const dropdown = document.getElementById("uniqueKeySelect");
-    dropdown.querySelector(`option[value="${srn}"]`)?.remove();
+    // Save current SRN temporarily until feedback is submitted
+    sessionStorage.setItem("currentSRN", srn);
 
     // Go to Feedback Questions Page
     nextPage();
   }
 
-  // ✅ After feedback → loop back if students left
+  // ✅ After feedback → Submit with loading
   function finalizeGrade() {
-    const remainingOptions = document.getElementById("uniqueKeySelect").options.length;
+    const btn = document.getElementById("submitFeedbackBtn");
+    btn.disabled = true;
+    btn.innerHTML = `<span class="spinner-border animate-spin mr-2"></span> Submitting...`;
 
-    if (remainingOptions > 1) {
-      // Still SRNs left → back to Page 2
-      document.getElementById("page" + currentPage).classList.remove("active-page");
-      currentPage = 2;
-      document.getElementById("page" + currentPage).classList.add("active-page");
-    } else {
-      // No SRNs left → go to Thank You page
-      nextPage();
-    }
+    // Simulate saving data (replace with fetch() to GAS/DB)
+    setTimeout(() => {
+      const srn = sessionStorage.getItem("currentSRN");
+      if (srn) {
+        usedSRNs.push(srn);
+        sessionStorage.removeItem("currentSRN");
+      }
+
+      // Update SRN dropdown (remove submitted SRN)
+      populateSRNDropdown();
+
+      // Reset button state
+      btn.disabled = false;
+      btn.innerHTML = "Submit Feedback";
+
+      // Check if any SRNs left
+      if (allSRNs.length > usedSRNs.length) {
+        // Go back to Page 2 for next student
+        document.getElementById("page" + currentPage).classList.remove("active-page");
+        currentPage = 2;
+        document.getElementById("page" + currentPage).classList.add("active-page");
+      } else {
+        // All SRNs completed → Thank You page
+        nextPage();
+      }
+    }, 1500); // fake loading time
   }
 </script>
