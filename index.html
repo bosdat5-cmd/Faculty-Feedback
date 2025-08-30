@@ -56,7 +56,7 @@ input:focus, select:focus { border-color:#00b4d8; box-shadow:0 0 6px rgba(0,180,
   <div class="form-page" id="page2">
     <h3>Session Feedback</h3>
     <label>Day:</label>
-    <select id="daySelect" disabled></select>
+    <select id="daySelect"></select>
 
     <label>Student Unique Key (SRN):</label>
     <select id="uniqueKeySelect">
@@ -94,7 +94,7 @@ input:focus, select:focus { border-color:#00b4d8; box-shadow:0 0 6px rgba(0,180,
 <script>
 let currentPage = 1;
 let srnListGlobal = [];
-let lockedDay = ""; // Will be set by faculty
+let lockedDay = ""; // Will lock only after first feedback
 const questions = [
   "Subject knowledge","Session planning & structure","Communication skills",
   "Engagement & interaction","Innovative methods","Time management",
@@ -161,9 +161,14 @@ function prevPage() {
 // Page 1 Next
 function nextPage1() {
   if(!srnListGlobal.length){ alert("Upload student data first"); return; }
-  lockedDay = document.getElementById("lockDaySelect").value;
-  if(!lockedDay){ alert("Select a day"); return; }
-  document.getElementById("daySelect").innerHTML = `<option>Day ${lockedDay}</option>`;
+
+  const selectedDay = document.getElementById("lockDaySelect").value;
+  if(!selectedDay){ alert("Select a day"); return; }
+
+  const dayDropdown = document.getElementById("daySelect");
+  dayDropdown.innerHTML = `<option value="${selectedDay}">Day ${selectedDay}</option>`;
+  dayDropdown.disabled = false; // still editable
+
   nextPage();
 }
 
@@ -217,6 +222,13 @@ function populateSRNDropdown() {
 function submitForm() {
   const selectedSRN = document.getElementById("uniqueKeySelect").value;
   if(!selectedSRN){ alert("Select SRN"); return; }
+
+  // Lock day after first feedback
+  const dayDropdown = document.getElementById("daySelect");
+  if(!lockedDay){ 
+    lockedDay = dayDropdown.value;
+    dayDropdown.disabled = true; // lock now
+  }
 
   srnListGlobal = srnListGlobal.map(srn => srn.value === selectedSRN ? { ...srn, completed:true } : srn );
   populateSRNDropdown();
