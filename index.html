@@ -38,6 +38,12 @@ input:focus, select:focus { border-color:#00b4d8; box-shadow:0 0 6px rgba(0,180,
     <label>Batch ID:</label>
     <input type="text" id="batchId" placeholder="Enter batch ID" required>
 
+    <h3>Select Day for Feedback</h3>
+    <label>Day:</label>
+    <select id="lockDaySelect" required>
+      <option value="">-- Select Day --</option>
+    </select>
+
     <h3>Student Data</h3>
     <button class="btn" onclick="downloadTemplate()">📥 Download Excel Template</button>
     <label>Upload Student Data File:</label>
@@ -88,7 +94,7 @@ input:focus, select:focus { border-color:#00b4d8; box-shadow:0 0 6px rgba(0,180,
 <script>
 let currentPage = 1;
 let srnListGlobal = [];
-let lockedDay = 1; // Fixed Day
+let lockedDay = ""; // Will be set by faculty
 const questions = [
   "Subject knowledge","Session planning & structure","Communication skills",
   "Engagement & interaction","Innovative methods","Time management",
@@ -96,6 +102,17 @@ const questions = [
   "Professional conduct","Technology use","Discipline",
   "Student feedback","Contribution to growth","Overall impact"
 ];
+
+// Populate day dropdown for Page 1
+function populateDayDropdown() {
+  const daySelect = document.getElementById("lockDaySelect");
+  for(let i=1;i<=15;i++){
+    const opt = document.createElement("option");
+    opt.value = i;
+    opt.textContent = "Day " + i;
+    daySelect.appendChild(opt);
+  }
+}
 
 // Render Questions
 function renderQuestions() {
@@ -144,6 +161,8 @@ function prevPage() {
 // Page 1 Next
 function nextPage1() {
   if(!srnListGlobal.length){ alert("Upload student data first"); return; }
+  lockedDay = document.getElementById("lockDaySelect").value;
+  if(!lockedDay){ alert("Select a day"); return; }
   document.getElementById("daySelect").innerHTML = `<option>Day ${lockedDay}</option>`;
   nextPage();
 }
@@ -199,7 +218,6 @@ function submitForm() {
   const selectedSRN = document.getElementById("uniqueKeySelect").value;
   if(!selectedSRN){ alert("Select SRN"); return; }
 
-  // Mark SRN completed
   srnListGlobal = srnListGlobal.map(srn => srn.value === selectedSRN ? { ...srn, completed:true } : srn );
   populateSRNDropdown();
 
@@ -232,7 +250,11 @@ function showDailyQuote() {
   document.getElementById("dailyQuote").innerText = quotes[today%quotes.length];
 }
 
-document.addEventListener("DOMContentLoaded", renderQuestions);
+// Initialize
+document.addEventListener("DOMContentLoaded", () => {
+  renderQuestions();
+  populateDayDropdown();
+});
 </script>
 </body>
 </html>
