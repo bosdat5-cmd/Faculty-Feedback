@@ -88,7 +88,7 @@ input:focus, select:focus { border-color:#00b4d8; box-shadow:0 0 6px rgba(0,180,
 <script>
 let currentPage = 1;
 let srnListGlobal = [];
-let lockedDay = 1; // Default Day 1
+let lockedDay = 1; // Fixed Day
 const questions = [
   "Subject knowledge","Session planning & structure","Communication skills",
   "Engagement & interaction","Innovative methods","Time management",
@@ -141,7 +141,7 @@ function prevPage() {
   document.getElementById("page"+currentPage).classList.add("active-page");
 }
 
-// Page 1 Next (set day and move to Page 2)
+// Page 1 Next
 function nextPage1() {
   if(!srnListGlobal.length){ alert("Upload student data first"); return; }
   document.getElementById("daySelect").innerHTML = `<option>Day ${lockedDay}</option>`;
@@ -160,13 +160,15 @@ function downloadTemplate() {
 function handleFileUpload(event) {
   const file = event.target.files[0];
   const reader = new FileReader();
+
   reader.onload = function(e) {
     const data = new Uint8Array(e.target.result);
     const workbook = XLSX.read(data,{type:"array"});
     const sheet = workbook.Sheets[workbook.SheetNames[0]];
     const jsonData = XLSX.utils.sheet_to_json(sheet,{header:1});
+
     srnListGlobal = [];
-    for(let i=1;i<jsonData.length;i++){
+    for(let i=1;i<jsonData.length;i++) {
       if(jsonData[i][1]){
         srnListGlobal.push({ value: jsonData[i][1], completed: false });
       }
@@ -174,6 +176,7 @@ function handleFileUpload(event) {
     populateSRNDropdown();
     alert("✅ Student SRNs loaded!");
   }
+
   reader.readAsArrayBuffer(file);
 }
 
@@ -192,13 +195,11 @@ function populateSRNDropdown() {
 }
 
 // Submit feedback
-async function submitForm() {
+function submitForm() {
   const selectedSRN = document.getElementById("uniqueKeySelect").value;
   if(!selectedSRN){ alert("Select SRN"); return; }
 
-  // Call backend here if needed
-  // await fetch(`YOUR_WEB_APP_URL/submit?email=...&day=${lockedDay}&srn=${selectedSRN}`);
-
+  // Mark SRN completed
   srnListGlobal = srnListGlobal.map(srn => srn.value === selectedSRN ? { ...srn, completed:true } : srn );
   populateSRNDropdown();
 
