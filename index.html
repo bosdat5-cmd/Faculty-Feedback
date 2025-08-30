@@ -202,12 +202,13 @@ function handleFileUpload(event) {
     const sheet = workbook.Sheets[workbook.SheetNames[0]];
     const jsonData = XLSX.utils.sheet_to_json(sheet,{header:1});
 
-    srnListGlobal = [];
-    for(let i=1;i<jsonData.length;i++) {
-      if(jsonData[i][1]){
-        srnListGlobal.push({ value: jsonData[i][1], completed: false });
-      }
-    }
+// Detect SRNs in first column if second column is empty
+for(let i=1;i<jsonData.length;i++) {
+  const srn = jsonData[i][1] || jsonData[i][0]; // Try 2nd column, fallback to 1st
+  if(srn){
+    srnListGlobal.push({ value: srn.toString().trim(), completed: false });
+  }
+}
     populateSRNDropdown();
     alert("✅ Student SRNs loaded!");
   }
@@ -279,3 +280,4 @@ document.addEventListener("DOMContentLoaded", () => {
 </script>
 </body>
 </html>
+
