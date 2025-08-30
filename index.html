@@ -10,15 +10,26 @@
       font-family: Arial, sans-serif; 
       background: #f0ebf8; 
     }
+    .container { 
+      max-width: 800px; 
+      margin: auto; 
+      padding: 20px; 
+      background: #fff; 
+      border-radius: 10px; 
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1); 
+    }
     .form-page { display: none; }
     .active-page { display: block; }
-    .btn {
-      background: #0077b6; color: white; padding: 8px 16px; margin-top: 10px; border-radius: 5px;
+    .btn { 
+      background: #0077b6; 
+      color: white; 
+      padding: 10px 20px; 
+      border: none; 
+      border-radius: 6px; 
+      cursor: pointer; 
+      margin-top: 15px; 
     }
-    .btn:disabled {
-      background: #cccccc;
-      cursor: not-allowed;
-    }
+    .btn:hover { background: #023e8a; }
   </style>
 </head>
 <body>
@@ -79,6 +90,7 @@
     <!-- Page 3: Feedback Questions -->
     <div class="form-page" id="page3">
       <h2 class="text-xl font-semibold mb-4 text-center">Feedback Questions</h2>
+
       <div id="questionsContainer" class="space-y-4"></div>
 
       <div id="resultBox" class="mt-6 p-4 border rounded bg-gray-100">
@@ -107,38 +119,43 @@
   </div>
 
 <script>
-  let uploadedKeys = []; 
-  let submittedKeys = []; 
-  let submittedDays = {}; 
+  let pages = document.querySelectorAll(".form-page");
+  let currentPage = 0;
+  let studentKeys = ["SRN001","SRN002","SRN003"]; // Example SRNs
 
-  function downloadTemplate(){ alert("Excel Template Downloaded!"); }
-  function handleFileUpload(e){
-    uploadedKeys = ["SRN1","SRN2","SRN3"]; 
-    fillUniqueKeys();
+  function showPage(i) {
+    pages.forEach((p, idx) => p.classList.toggle("active-page", idx === i));
+    currentPage = i;
   }
-  function fillUniqueKeys(){
+  function nextPage() { showPage(currentPage + 1); }
+  function prevPage() { showPage(currentPage - 1); }
+
+  // Fill SRN dropdown
+  function populateKeys() {
     const select = document.getElementById("uniqueKeySelect");
     select.innerHTML = `<option value="">-- Select SRN --</option>`;
-    uploadedKeys.forEach(key=>{
-      if(!submittedKeys.includes(key)){
-        let opt=document.createElement("option");
-        opt.value=key; opt.textContent=key;
-        select.appendChild(opt);
-      }
+    studentKeys.forEach(k => {
+      const opt = document.createElement("option");
+      opt.value = k; opt.textContent = k;
+      select.appendChild(opt);
     });
   }
 
-  const questions = ["Subject knowledge","Session planning & structure","Communication skills",
+  // Feedback Questions
+  const questions = [
+    "Subject knowledge","Session planning & structure","Communication skills",
     "Engagement & interaction","Innovative methods","Time management",
     "Adherence to guidelines","Response to questions","Practical examples",
     "Professional conduct","Technology use","Discipline",
-    "Student feedback","Contribution to growth","Overall impact"];
+    "Student feedback","Contribution to growth","Overall impact"
+  ];
 
-  function renderQuestions(){
-    const c=document.getElementById("questionsContainer"); c.innerHTML="";
-    questions.forEach((q,i)=>{
-      let b=document.createElement("div");
-      b.innerHTML=`<label>${i+1}. ${q}</label>
+  function renderQuestions() {
+    const container = document.getElementById("questionsContainer");
+    questions.forEach((q, i) => {
+      const block = document.createElement("div");
+      block.innerHTML = `
+        <label class="block mb-2">${i+1}. ${q}</label>
         <select name="q${i+1}" class="ratingSelect w-full p-2 border rounded" required>
           <option value="">-- Select Rating --</option>
           <option value="20">1 - Poor (20)</option>
@@ -146,67 +163,57 @@
           <option value="60">3 - Average (60)</option>
           <option value="80">4 - Good (80)</option>
           <option value="100">5 - Excellent (100)</option>
-        </select>`;
-      c.appendChild(b);
+        </select>
+      `;
+      container.appendChild(block);
     });
-    document.querySelectorAll(".ratingSelect").forEach(sel=>{
+
+    document.querySelectorAll(".ratingSelect").forEach(sel => {
       sel.addEventListener("change", updateLiveScore);
     });
   }
-  document.addEventListener("DOMContentLoaded", renderQuestions);
-
-  function updateLiveScore(){
-    const selects=document.querySelectorAll("#questionsContainer select");
-    let total=0,count=0;
-    selects.forEach(sel=>{if(sel.value){total+=+sel.value; count++;}});
-    const avg=count?total/count:0;
-    document.getElementById("finalScore").innerText=avg.toFixed(2);
-    let g="-"; if(avg>=85) g="A+"; else if(avg>=70) g="A"; else if(avg>=50) g="B+"; else if(avg>=30) g="B"; else if(avg>0) g="C";
-    document.getElementById("finalGrade").innerText=g;
-  }
-
-  function submitForm(){
-    const day=document.getElementById("daySelect").value;
-    const key=document.getElementById("uniqueKeySelect").value;
-    const email=document.getElementById("emailId").value.trim();
-    if(!day||!key){alert("Select Day & SRN");return;}
-
-    if(submittedDays[email+"-"+day]){
-      alert("You already submitted feedback for "+day); return;
-    }
-    localStorage.setItem("currentKey",key);
-    localStorage.setItem("currentDay",day);
-    nextPage();
-  }
-
-  function finalizeGrade(){
-    const btn=document.getElementById("submitBtn");
-    btn.disabled=true; btn.textContent="Submitting...";
-    setTimeout(()=>{
-      const key=localStorage.getItem("currentKey");
-      const day=localStorage.getItem("currentDay");
-      const email=document.getElementById("emailId").value.trim();
-      submittedKeys.push(key);
-      submittedDays[email+"-"+day]=true;
-      uploadedKeys=uploadedKeys.filter(k=>k!==key);
-      btn.disabled=false; btn.textContent="Submit";
-      if(uploadedKeys.length===0){
-        showPage(4);
-      } else {
-        alert("Feedback saved for "+key+". Now select another student.");
-        fillUniqueKeys(); showPage(2);
-      }
-    },1500);
-  }
-
-  function showPage(n){document.querySelectorAll(".form-page").forEach((p,i)=>p.classList.remove("active-page")); document.getElementById("page"+n).classList.add("active-page");}
-  function nextPage(){let pages=[...document.querySelectorAll(".form-page")];let i=pages.findIndex(p=>p.classList.contains("active-page"));if(i>=0&&i<pages.length-1){pages[i].classList.remove("active-page");pages[i+1].classList.add("active-page");}}
-  function prevPage(){let pages=[...document.querySelectorAll(".form-page")];let i=pages.findIndex(p=>p.classList.contains("active-page"));if(i>0){pages[i].classList.remove("active-page");pages[i-1].classList.add("active-page");}}
-
-  document.addEventListener("DOMContentLoaded",()=>{
-    const quotes=["Success is not final, failure is not fatal.","Believe you can and you're halfway there.","Do something today that your future self will thank you for."];
-    document.getElementById("dailyQuote").innerText=quotes[Math.floor(Math.random()*quotes.length)];
+  document.addEventListener("DOMContentLoaded", () => {
+    renderQuestions();
+    populateKeys();
   });
+
+  function updateLiveScore() {
+    const selects = document.querySelectorAll("#questionsContainer select");
+    let total = 0, count = 0;
+    selects.forEach(sel => {
+      if (sel.value) {
+        total += parseInt(sel.value);
+        count++;
+      }
+    });
+    const avg = count ? total / count : 0;
+    document.getElementById("finalScore").innerText = avg.toFixed(2);
+
+    let grade = "-";
+    if (avg >= 85) grade = "A+";
+    else if (avg >= 70) grade = "A";
+    else if (avg >= 50) grade = "B+";
+    else if (avg >= 30) grade = "B";
+    else if (avg > 0) grade = "C";
+
+    document.getElementById("finalGrade").innerText = grade;
+  }
+
+  function finalizeGrade() {
+    showPage(3); // thank you page
+    setTimeout(() => {
+      // Remove submitted SRN
+      const srn = document.getElementById("uniqueKeySelect").value;
+      studentKeys = studentKeys.filter(k => k !== srn);
+
+      if (studentKeys.length > 0) {
+        populateKeys();
+        showPage(1); // go back to select SRN
+      } else {
+        alert("All students have submitted feedback!");
+      }
+    }, 1000);
+  }
 </script>
 </body>
 </html>
