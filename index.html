@@ -148,108 +148,28 @@
       </select>
 
       <button class="btn" onclick="prevPage()">⬅ Back</button>
-      <button class="btn" onclick="goToQuestions()">✅ Submit</button>
+      <button class="btn" onclick="submitForm()">✅ Submit</button>
     </div>
 
-    <!-- ================= PAGE 3: FEEDBACK QUESTIONS ================= -->
-    <div class="form-page" id="page3">
-      <h2 class="text-xl font-semibold mb-4 text-center">Feedback Questions</h2>
-      <div id="questionsContainer"></div>
+<!-- ================= PAGE 3: FEEDBACK QUESTIONS ================= -->
+<div class="form-page" id="page3">
+  <h2 class="text-xl font-semibold mb-4 text-center">Feedback Questions</h2>
 
-      <div id="resultBox" class="mt-6 p-4 border rounded bg-gray-100">
-        <p class="text-lg font-semibold">Weightage Score: <span id="finalScore">0</span></p>
-        <p class="text-lg font-semibold">Grade: <span id="finalGrade">-</span></p>
-      </div>
+  <div id="questionsContainer" class="space-y-4"></div>
 
-      <div class="flex justify-between mt-6">
-        <button type="button" onclick="prevPage()" class="btn">⬅ Back</button>
-        <button type="button" onclick="finalizeGrade()" id="submitBtn" class="btn">Submit Feedback</button>
-      </div>
-    </div>
-
-    <!-- ================= PAGE 4: THANK YOU ================= -->
-    <div class="form-page" id="page4">
-      <div class="text-center p-6">
-        <h2 class="text-2xl font-bold mb-4">Thank You!</h2>
-        <p class="text-lg mb-6">Your feedback has been successfully submitted.</p>
-        <div class="quote-box">
-          <h3>✨ Daily Motivational Quote ✨</h3>
-          <p id="dailyQuote"></p>
-        </div>
-      </div>
-    </div>
+  <!-- Result will show here -->
+  <div id="resultBox" class="mt-6 p-4 border rounded bg-gray-100">
+    <p class="text-lg font-semibold">Weightage Score: <span id="finalScore">0</span></p>
+    <p class="text-lg font-semibold">Grade: <span id="finalGrade">-</span></p>
   </div>
 
+  <div class="flex justify-between mt-6">
+    <button type="button" onclick="prevPage()" class="bg-gray-500 text-white px-4 py-2 rounded">Back</button>
+    <button type="button" onclick="finalizeGrade()" id="submitBtn" class="bg-blue-600 text-white px-4 py-2 rounded">Submit</button>
+  </div>
+</div>
+
 <script>
-  let currentPage = 1;
-  let studentKeys = [];
-  let usedKeys = [];
-  let selectedDay = "";
-
-  // Navigation
-  function nextPage() {
-    document.getElementById("page" + currentPage).classList.remove("active-page");
-    currentPage++;
-    document.getElementById("page" + currentPage).classList.add("active-page");
-  }
-  function prevPage() {
-    document.getElementById("page" + currentPage).classList.remove("active-page");
-    currentPage--;
-    document.getElementById("page" + currentPage).classList.add("active-page");
-  }
-
-  // Excel Template
-  function downloadTemplate() {
-    const wb = XLSX.utils.book_new();
-    const ws = XLSX.utils.aoa_to_sheet([["S.No", "SRN", "Name"]]);
-    XLSX.utils.book_append_sheet(wb, ws, "Template");
-    XLSX.writeFile(wb, "Student_Template.xlsx");
-  }
-
-  // Upload Excel
-  function handleFileUpload(event) {
-    const file = event.target.files[0];
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      const data = new Uint8Array(e.target.result);
-      const workbook = XLSX.read(data, { type: "array" });
-      const sheet = workbook.Sheets[workbook.SheetNames[0]];
-      const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-      studentKeys = [];
-      for (let i = 1; i < jsonData.length; i++) {
-        if (jsonData[i][1]) studentKeys.push(jsonData[i][1]);
-      }
-      refreshStudentDropdown();
-      alert("✅ Student SRNs loaded successfully!");
-    };
-    reader.readAsArrayBuffer(file);
-  }
-
-  function refreshStudentDropdown() {
-    const dropdown = document.getElementById("uniqueKeySelect");
-    dropdown.innerHTML = '<option value="">-- Select SRN --</option>';
-    studentKeys.filter(k => !usedKeys.includes(k)).forEach(srn => {
-      const opt = document.createElement("option");
-      opt.value = srn;
-      opt.textContent = srn;
-      dropdown.appendChild(opt);
-    });
-  }
-
-  // Go to Questions Page
-  function goToQuestions() {
-    const day = document.getElementById("daySelect").value;
-    const key = document.getElementById("uniqueKeySelect").value;
-    if (!day || !key) { alert("Please select both Day and SRN"); return; }
-
-    if (!selectedDay) selectedDay = day; // freeze first chosen day
-    if (day !== selectedDay) { alert("You can only submit for " + selectedDay); return; }
-
-    document.getElementById("page2").classList.remove("active-page");
-    document.getElementById("page3").classList.add("active-page");
-  }
-
-  // Questions
   const questions = [
     "Subject knowledge","Session planning & structure","Communication skills",
     "Engagement & interaction","Innovative methods","Time management",
@@ -257,60 +177,76 @@
     "Professional conduct","Technology use","Discipline",
     "Student feedback","Contribution to growth","Overall impact"
   ];
+
   function renderQuestions() {
     const container = document.getElementById("questionsContainer");
-    questions.forEach((q,i)=>{
+    questions.forEach((q, i) => {
       const block = document.createElement("div");
-      block.innerHTML = `<label>${i+1}. ${q}</label>
-        <select class="ratingSelect">
+      block.innerHTML = `
+        <label class="block mb-2">${i+1}. ${q}</label>
+        <select name="q${i+1}" class="ratingSelect w-full p-2 border rounded" required>
           <option value="">-- Select Rating --</option>
           <option value="20">1 - Poor (20)</option>
           <option value="40">2 - Below Average (40)</option>
           <option value="60">3 - Average (60)</option>
           <option value="80">4 - Good (80)</option>
           <option value="100">5 - Excellent (100)</option>
-        </select>`;
+        </select>
+      `;
       container.appendChild(block);
     });
-    document.querySelectorAll(".ratingSelect").forEach(sel=>sel.addEventListener("change",updateLiveScore));
+
+    // Attach live update listener
+    document.querySelectorAll(".ratingSelect").forEach(sel => {
+      sel.addEventListener("change", updateLiveScore);
+    });
   }
-  document.addEventListener("DOMContentLoaded",renderQuestions);
+  document.addEventListener("DOMContentLoaded", renderQuestions);
 
   function updateLiveScore() {
-    const selects = document.querySelectorAll(".ratingSelect");
-    let total=0,count=0;
-    selects.forEach(sel=>{ if(sel.value){ total+=parseInt(sel.value); count++; }});
-    const avg = count? total/count:0;
+    const selects = document.querySelectorAll("#questionsContainer select");
+    let total = 0, count = 0;
+    selects.forEach(sel => {
+      if (sel.value) {
+        total += parseInt(sel.value);
+        count++;
+      }
+    });
+
+    const avg = count ? total / count : 0;
     document.getElementById("finalScore").innerText = avg.toFixed(2);
-    let grade="-";
-    if(avg>=85) grade="A+";
-    else if(avg>=70) grade="A";
-    else if(avg>=50) grade="B+";
-    else if(avg>=30) grade="B";
-    else if(avg>0) grade="C";
-    document.getElementById("finalGrade").innerText=grade;
+
+    let grade = "-";
+    if (avg >= 85) grade = "A+";
+    else if (avg >= 70) grade = "A";
+    else if (avg >= 50) grade = "B+";
+    else if (avg >= 30) grade = "B";
+    else if (avg > 0) grade = "C";
+
+    document.getElementById("finalGrade").innerText = grade;
   }
 
-  // Final Submit
   function finalizeGrade() {
-    const key = document.getElementById("uniqueKeySelect").value;
-    usedKeys.push(key);
-    refreshStudentDropdown();
-
-    if (studentKeys.length === usedKeys.length) {
-      // all done → Thank You page
-      document.getElementById("page3").classList.remove("active-page");
-      document.getElementById("page4").classList.add("active-page");
-      showDailyQuote();
-    } else {
-      // go back for next student
-      document.getElementById("page3").classList.remove("active-page");
-      document.getElementById("page2").classList.add("active-page");
-      document.getElementById("uniqueKeySelect").value="";
-    }
+    // When user clicks Submit → go to next page
+    nextPage();
   }
+</script>
 
-  // Quotes
+<!-- ================= PAGE 4: THANK YOU ================= -->
+<div class="form-page" id="page4">
+  <div class="text-center p-6">
+    <h2 class="text-2xl font-bold mb-4">Thank You!</h2>
+    <p class="text-lg mb-6">Your feedback has been successfully submitted.</p>
+
+    <!-- Daily Motivational Quote -->
+    <div class="bg-white shadow-md rounded-lg p-6 max-w-xl mx-auto mt-6">
+      <h3 class="text-xl font-semibold mb-2">✨ Daily Motivational Quote ✨</h3>
+      <p id="dailyQuote" class="italic text-gray-700"></p>
+    </div>
+  </div>
+</div>
+
+<script>
   const quotes = [
     "Success is not final, failure is not fatal: it is the courage to continue that counts.",
     "The best way to predict the future is to create it.",
@@ -323,6 +259,90 @@
     const today = new Date().getDate();
     document.getElementById("dailyQuote").innerText = quotes[today % quotes.length];
   }
+  document.addEventListener("DOMContentLoaded", showDailyQuote);
 </script>
+
+  <script>
+    let currentPage = 1;
+
+    function nextPage() {
+      document.getElementById("page" + currentPage).classList.remove("active-page");
+      currentPage++;
+      document.getElementById("page" + currentPage).classList.add("active-page");
+    }
+
+    function prevPage() {
+      document.getElementById("page" + currentPage).classList.remove("active-page");
+      currentPage--;
+      document.getElementById("page" + currentPage).classList.add("active-page");
+    }
+
+    // ✅ Download Excel Template
+    function downloadTemplate() {
+      const wb = XLSX.utils.book_new();
+      const wsData = [["S.No", "SRN", "Name"]]; // Header row
+      const ws = XLSX.utils.aoa_to_sheet(wsData);
+      XLSX.utils.book_append_sheet(wb, ws, "Template");
+      XLSX.writeFile(wb, "Student_Template.xlsx");
+    }
+
+    // ✅ Handle Excel Upload
+    function handleFileUpload(event) {
+      const file = event.target.files[0];
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: "array" });
+        const sheetName = workbook.SheetNames[0];
+        const sheet = workbook.Sheets[sheetName];
+        const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+        // Extract SRN column (2nd column)
+        let srnList = [];
+        for (let i = 1; i < jsonData.length; i++) {
+          if (jsonData[i][1]) srnList.push(jsonData[i][1]);
+        }
+
+        // Populate dropdown
+        const dropdown = document.getElementById("uniqueKeySelect");
+        dropdown.innerHTML = '<option value="">-- Select SRN --</option>';
+        srnList.forEach(srn => {
+          const opt = document.createElement("option");
+          opt.value = srn;
+          opt.textContent = srn;
+          dropdown.appendChild(opt);
+        });
+
+        alert("✅ Student SRNs loaded successfully!");
+      };
+      reader.readAsArrayBuffer(file);
+    }
+
+    // ✅ Submit and Show Thank You Page with Quote
+    function submitForm() {
+      // Show Thank You Page
+      document.getElementById("page" + currentPage).classList.remove("active-page");
+      currentPage++;
+      document.getElementById("page" + currentPage).classList.add("active-page");
+
+      // Daily Motivational Quotes
+      const quotes = [
+        "Success is not final, failure is not fatal: it is the courage to continue that counts.",
+        "Believe you can and you're halfway there.",
+        "Don’t watch the clock; do what it does. Keep going.",
+        "Great things never come from comfort zones.",
+        "Push yourself, because no one else is going to do it for you.",
+        "Dream bigger. Do bigger.",
+        "Your limitation—it’s only your imagination.",
+        "Hard work beats talent when talent doesn’t work hard.",
+        "Don’t stop until you’re proud.",
+        "Doubt kills more dreams than failure ever will."
+      ];
+
+      const today = new Date();
+      const index = today.getDate() % quotes.length;
+      document.getElementById("quoteBox").innerText = quotes[index];
+    }
+  </script>
 </body>
 </html>
