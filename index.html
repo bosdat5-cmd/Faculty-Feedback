@@ -101,16 +101,12 @@
 const daySelect = document.getElementById("daySelect");
 const emailInput = document.getElementById("emailId");
 
-let selectedDayValue = null; // permanently stores the selected Day
+// Automatically select Day 1 and lock the dropdown
+daySelect.value = "Day 1";
+daySelect.disabled = true;
 
-daySelect.addEventListener("change", () => {
-  if (!selectedDayValue && daySelect.value) {
-    selectedDayValue = daySelect.value;   // store selected day
-    daySelect.disabled = true;            // lock dropdown immediately
-    // Make email required only for Day 1 or Day 2
-    emailInput.required = selectedDayValue === "Day 1" || selectedDayValue === "Day 2";
-  }
-});
+// Make email required for Day 1
+emailInput.required = true;
 </script>
 
   <div class="container">
@@ -328,6 +324,7 @@ function submitForm() {
 </script>
 </body>
 </html>
+
 
 
 
