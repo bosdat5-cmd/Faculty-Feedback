@@ -336,6 +336,27 @@
       return;
     }
 
+// ✅ Restrict email to max 2 days
+const email = document.getElementById("emailId").value;
+if (!email) {
+  alert("⚠ Email is mandatory!");
+  return;
+}
+
+// Initialize tracking for this email
+let emailData = JSON.parse(localStorage.getItem(email)) || { completedDays: [] };
+
+// If already 2 days done → block
+if (emailData.completedDays.length >= 2) {
+  alert("⚠ This email has already submitted feedback for 2 days.");
+  return;
+}
+
+// If day already submitted → block
+if (emailData.completedDays.includes(day)) {
+  alert(`⚠ You already submitted feedback for ${day} with this email.`);
+  return;
+}
     // Freeze the selected day (esp. Day 1)
     if (!usedDays.includes(day)) {
       usedDays.push(day);
@@ -354,36 +375,55 @@
 
   // ✅ After feedback → Submit with loading
   function finalizeGrade() {
-    const btn = document.getElementById("submitFeedbackBtn");
-    btn.disabled = true;
-    btn.innerHTML = `<span class="spinner-border animate-spin mr-2"></span> Submitting...`;
+  const srn = sessionStorage.getItem("selectedSRN");
+  const day = sessionStorage.getItem("selectedDay");
+  const email = document.getElementById("emailId").value;
 
-    // Simulate saving data (replace with fetch() to GAS/DB)
-    setTimeout(() => {
-      const srn = sessionStorage.getItem("currentSRN");
-      if (srn) {
-        usedSRNs.push(srn);
-        sessionStorage.removeItem("currentSRN");
-      }
-
-      // Update SRN dropdown (remove submitted SRN)
-      populateSRNDropdown();
-
-      // Reset button state
-      btn.disabled = false;
-      btn.innerHTML = "Submit Feedback";
-
-      // Check if any SRNs left
-      if (allSRNs.length > usedSRNs.length) {
-        // Go back to Page 2 for next student
-        document.getElementById("page" + currentPage).classList.remove("active-page");
-        currentPage = 2;
-        document.getElementById("page" + currentPage).classList.add("active-page");
-      } else {
-        // All SRNs completed → Thank You page
-        nextPage();
-      }
-    }, 1500); // fake loading time
+  if (!srn || !day || !email) {
+    alert("⚠ Missing data, please restart the form.");
+    return;
   }
+
+  // Show submitting state
+  const submitBtn = document.querySelector("#page3 .btn");
+  submitBtn.innerHTML = "⏳ Submitting...";
+  submitBtn.disabled = true;
+
+  setTimeout(() => {
+    // ✅ Save completed day for this email
+    let emailData = JSON.parse(localStorage.getItem(email)) || { completedDays: [] };
+    if (!emailData.completedDays.includes(day)) {
+      emailData.completedDays.push(day);
+      localStorage.setItem(email, JSON.stringify(emailData));
+    }
+
+    // ✅ Remove SRN from dropdown
+    const srnSelect = document.getElementById("srnSelect");
+    for (let i = 0; i < srnSelect.options.length; i++) {
+      if (srnSelect.options[i].value === srn) {
+        srnSelect.remove(i);
+        break;
+      }
+    }
+
+    // Reset button
+    submitBtn.innerHTML = "✅ Submitted";
+    submitBtn.disabled = false;
+
+    // ✅ If more SRNs left → go back to Page 2
+    if (srnSelect.options.length > 0) {
+      goToPage(2);
+    } else {
+      // ✅ If 2 days completed → show Thank You
+      if (emailData.completedDays.length >= 2) {
+        goToPage(4);
+      } else {
+        // Otherwise still can pick next day later
+        goToPage(2);
+      }
+    }
+  }, 1000);
+}
 </script>
+
 
