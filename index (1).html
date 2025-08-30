@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>THE INSTITUTE OF CHARTERED ACCOUNTANTS OF INDIA</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #0077b6, #00b4d8);
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+    }
+    .container {
+      background: #fff;
+      margin-top: 40px;
+      padding: 30px;
+      border-radius: 15px;
+      width: 500px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+      animation: fadeIn 0.5s ease-in-out;
+    }
+    h2 {
+      text-align: center;
+      color: #023e8a;
+      margin-bottom: 20px;
+      font-weight: 600;
+    }
+    h3 {
+      color: #0077b6;
+      margin-bottom: 15px;
+    }
+    label {
+      font-weight: 500;
+      display: block;
+      margin: 8px 0 5px;
+      color: #333;
+    }
+    input, select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      outline: none;
+      font-size: 14px;
+      margin-bottom: 15px;
+      transition: all 0.3s;
+    }
+    input:focus, select:focus {
+      border-color: #00b4d8;
+      box-shadow: 0 0 6px rgba(0,180,216,0.5);
+    }
+    .btn {
+      display: inline-block;
+      background: #0077b6;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 10px 18px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      margin: 5px 5px 0 0;
+      transition: all 0.3s;
+    }
+    .btn:hover {
+      background: #023e8a;
+      transform: scale(1.05);
+    }
+    .form-page { display: none; }
+    .active-page { display: block; }
+    .quote-box {
+      background: #f1faff;
+      padding: 20px;
+      border-left: 5px solid #00b4d8;
+      margin-top: 20px;
+      border-radius: 10px;
+      font-style: italic;
+      color: #333;
+    }
+    .thankyou {
+      text-align: center;
+      color: #023e8a;
+      font-size: 18px;
+      font-weight: 600;
+      margin-top: 10px;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>THE INSTITUTE OF CHARTERED ACCOUNTANT OF INDIA</h2>
+    <h3 style="text-align:center; color:#0077b6; margin-top:-10px; margin-bottom:20px;">
+      Faculty Feedback Form
+    </h3>
+
+    <!-- Page 1: Basic Details -->
+    <div class="form-page active-page" id="page1">
+      <h3>Basic Details</h3>
+
+      <label>Faculty Name:</label>
+      <input type="text" id="facultyName" placeholder="Enter faculty name" required>
+
+      <label>Mobile Number:</label>
+      <input type="text" id="mobileNumber" placeholder="10-digit mobile" required>
+
+      <label>Email ID:</label>
+      <input type="email" id="emailId" placeholder="example@email.com" required>
+
+      <label>Batch ID:</label>
+      <input type="text" id="batchId" placeholder="Enter batch ID" required>
+
+      <h3>Student Data</h3>
+      <button class="btn" onclick="downloadTemplate()">📥 Download Excel Template</button>
+
+      <label style="margin-top:15px;">Upload Student Data File:</label>
+      <input type="file" id="excelFile" accept=".xlsx, .xls" onchange="handleFileUpload(event)">
+
+      <button class="btn" onclick="nextPage()">➡ Next</button>
+    </div>
+
+    <!-- Page 2: Session Feedback -->
+    <div class="form-page" id="page2">
+      <h3>Session Feedback</h3>
+
+      <label>Select Day:</label>
+      <select id="daySelect">
+        <option value="">-- Select Day --</option>
+        <option>Day 1</option><option>Day 2</option><option>Day 3</option>
+        <option>Day 4</option><option>Day 5</option><option>Day 6</option>
+        <option>Day 7</option><option>Day 8</option><option>Day 9</option>
+        <option>Day 10</option><option>Day 11</option><option>Day 12</option>
+        <option>Day 13</option><option>Day 14</option><option>Day 15</option>
+      </select>
+
+      <label>Student Unique Key (SRN):</label>
+      <select id="uniqueKeySelect">
+        <option value="">-- Select SRN --</option>
+      </select>
+
+      <button class="btn" onclick="prevPage()">⬅ Back</button>
+      <button class="btn" onclick="submitForm()">✅ Submit</button>
+    </div>
+
+<!-- ================= PAGE 3: FEEDBACK QUESTIONS ================= -->
+<div class="form-page" id="page3">
+  <h2 class="text-xl font-semibold mb-4 text-center">Feedback Questions</h2>
+
+  <div id="questionsContainer" class="space-y-4"></div>
+
+  <!-- Result will show here -->
+  <div id="resultBox" class="mt-6 p-4 border rounded bg-gray-100">
+    <p class="text-lg font-semibold">Weightage Score: <span id="finalScore">0</span></p>
+    <p class="text-lg font-semibold">Grade: <span id="finalGrade">-</span></p>
+  </div>
+
+  <div class="flex justify-between mt-6">
+    <button type="button" onclick="prevPage()" class="bg-gray-500 text-white px-4 py-2 rounded">Back</button>
+    <button type="button" onclick="finalizeGrade()" id="submitBtn" class="bg-blue-600 text-white px-4 py-2 rounded">Submit</button>
+  </div>
+</div>
+
+<script>
+  const questions = [
+    "Subject knowledge","Session planning & structure","Communication skills",
+    "Engagement & interaction","Innovative methods","Time management",
+    "Adherence to guidelines","Response to questions","Practical examples",
+    "Professional conduct","Technology use","Discipline",
+    "Student feedback","Contribution to growth","Overall impact"
+  ];
+
+  function renderQuestions() {
+    const container = document.getElementById("questionsContainer");
+    questions.forEach((q, i) => {
+      const block = document.createElement("div");
+      block.innerHTML = `
+        <label class="block mb-2">${i+1}. ${q}</label>
+        <select name="q${i+1}" class="ratingSelect w-full p-2 border rounded" required>
+          <option value="">-- Select Rating --</option>
+          <option value="20">1 - Poor (20)</option>
+          <option value="40">2 - Below Average (40)</option>
+          <option value="60">3 - Average (60)</option>
+          <option value="80">4 - Good (80)</option>
+          <option value="100">5 - Excellent (100)</option>
+        </select>
+      `;
+      container.appendChild(block);
+    });
+
+    // Attach live update listener
+    document.querySelectorAll(".ratingSelect").forEach(sel => {
+      sel.addEventListener("change", updateLiveScore);
+    });
+  }
+  document.addEventListener("DOMContentLoaded", renderQuestions);
+
+  function updateLiveScore() {
+    const selects = document.querySelectorAll("#questionsContainer select");
+    let total = 0, count = 0;
+    selects.forEach(sel => {
+      if (sel.value) {
+        total += parseInt(sel.value);
+        count++;
+      }
+    });
+
+    const avg = count ? total / count : 0;
+    document.getElementById("finalScore").innerText = avg.toFixed(2);
+
+    let grade = "-";
+    if (avg >= 85) grade = "A+";
+    else if (avg >= 70) grade = "A";
+    else if (avg >= 50) grade = "B+";
+    else if (avg >= 30) grade = "B";
+    else if (avg > 0) grade = "C";
+
+    document.getElementById("finalGrade").innerText = grade;
+  }
+
+  function finalizeGrade() {
+    // When user clicks Submit → go to next page
+    nextPage();
+  }
+</script>
+
+<!-- ================= PAGE 4: THANK YOU ================= -->
+<div class="form-page" id="page4">
+  <div class="text-center p-6">
+    <h2 class="text-2xl font-bold mb-4">Thank You!</h2>
+    <p class="text-lg mb-6">Your feedback has been successfully submitted.</p>
+
+    <!-- Daily Motivational Quote -->
+    <div class="bg-white shadow-md rounded-lg p-6 max-w-xl mx-auto mt-6">
+      <h3 class="text-xl font-semibold mb-2">✨ Daily Motivational Quote ✨</h3>
+      <p id="dailyQuote" class="italic text-gray-700"></p>
+    </div>
+  </div>
+</div>
+
+<script>
+  const quotes = [
+    "Success is not final, failure is not fatal: it is the courage to continue that counts.",
+    "The best way to predict the future is to create it.",
+    "Dream big. Start small. Act now.",
+    "Believe you can and you're halfway there.",
+    "Push yourself, because no one else is going to do it for you.",
+    "Great things never come from comfort zones."
+  ];
+  function showDailyQuote() {
+    const today = new Date().getDate();
+    document.getElementById("dailyQuote").innerText = quotes[today % quotes.length];
+  }
+  document.addEventListener("DOMContentLoaded", showDailyQuote);
+</script>
+
+  <script>
+    let currentPage = 1;
+
+    function nextPage() {
+      document.getElementById("page" + currentPage).classList.remove("active-page");
+      currentPage++;
+      document.getElementById("page" + currentPage).classList.add("active-page");
+    }
+
+    function prevPage() {
+      document.getElementById("page" + currentPage).classList.remove("active-page");
+      currentPage--;
+      document.getElementById("page" + currentPage).classList.add("active-page");
+    }
+
+    // ✅ Download Excel Template
+    function downloadTemplate() {
+      const wb = XLSX.utils.book_new();
+      const wsData = [["S.No", "SRN", "Name"]]; // Header row
+      const ws = XLSX.utils.aoa_to_sheet(wsData);
+      XLSX.utils.book_append_sheet(wb, ws, "Template");
+      XLSX.writeFile(wb, "Student_Template.xlsx");
+    }
+
+    // ✅ Handle Excel Upload
+    function handleFileUpload(event) {
+      const file = event.target.files[0];
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: "array" });
+        const sheetName = workbook.SheetNames[0];
+        const sheet = workbook.Sheets[sheetName];
+        const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+        // Extract SRN column (2nd column)
+        let srnList = [];
+        for (let i = 1; i < jsonData.length; i++) {
+          if (jsonData[i][1]) srnList.push(jsonData[i][1]);
+        }
+
+        // Populate dropdown
+        const dropdown = document.getElementById("uniqueKeySelect");
+        dropdown.innerHTML = '<option value="">-- Select SRN --</option>';
+        srnList.forEach(srn => {
+          const opt = document.createElement("option");
+          opt.value = srn;
+          opt.textContent = srn;
+          dropdown.appendChild(opt);
+        });
+
+        alert("✅ Student SRNs loaded successfully!");
+      };
+      reader.readAsArrayBuffer(file);
+    }
+
+    // ✅ Submit and Show Thank You Page with Quote
+    function submitForm() {
+      // Show Thank You Page
+      document.getElementById("page" + currentPage).classList.remove("active-page");
+      currentPage++;
+      document.getElementById("page" + currentPage).classList.add("active-page");
+
+      // Daily Motivational Quotes
+      const quotes = [
+        "Success is not final, failure is not fatal: it is the courage to continue that counts.",
+        "Believe you can and you're halfway there.",
+        "Don’t watch the clock; do what it does. Keep going.",
+        "Great things never come from comfort zones.",
+        "Push yourself, because no one else is going to do it for you.",
+        "Dream bigger. Do bigger.",
+        "Your limitation—it’s only your imagination.",
+        "Hard work beats talent when talent doesn’t work hard.",
+        "Don’t stop until you’re proud.",
+        "Doubt kills more dreams than failure ever will."
+      ];
+
+      const today = new Date();
+      const index = today.getDate() % quotes.length;
+      document.getElementById("quoteBox").innerText = quotes[index];
+    }
+  </script>
+</body>
+</html>
