@@ -262,9 +262,13 @@
   document.addEventListener("DOMContentLoaded", showDailyQuote);
 </script>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
 <script>
   let currentPage = 1;
+  let availableSRNs = []; // store SRNs from Excel
 
+  // ✅ Page navigation
   function nextPage() {
     document.getElementById("page" + currentPage).classList.remove("active-page");
     currentPage++;
@@ -298,24 +302,27 @@
       const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 
       // Extract SRN column (2nd column)
-      let srnList = [];
+      availableSRNs = [];
       for (let i = 1; i < jsonData.length; i++) {
-        if (jsonData[i][1]) srnList.push(jsonData[i][1]);
+        if (jsonData[i][1]) availableSRNs.push(jsonData[i][1]);
       }
 
-      // Populate dropdown
-      const dropdown = document.getElementById("uniqueKeySelect");
-      dropdown.innerHTML = '<option value="">-- Select SRN --</option>';
-      srnList.forEach(srn => {
-        const opt = document.createElement("option");
-        opt.value = srn;
-        opt.textContent = srn;
-        dropdown.appendChild(opt);
-      });
-
+      populateSRNDropdown();
       alert("✅ Student SRNs loaded successfully!");
     };
     reader.readAsArrayBuffer(file);
+  }
+
+  // ✅ Populate SRN dropdown
+  function populateSRNDropdown() {
+    const dropdown = document.getElementById("uniqueKeySelect");
+    dropdown.innerHTML = '<option value="">-- Select SRN --</option>';
+    availableSRNs.forEach(srn => {
+      const opt = document.createElement("option");
+      opt.value = srn;
+      opt.textContent = srn;
+      dropdown.appendChild(opt);
+    });
   }
 
   // ✅ Freeze Day selection once chosen
@@ -338,13 +345,14 @@
     localStorage.setItem("feedbackRecords", JSON.stringify(records));
   }
 
-  // ✅ Submit and Show Thank You Page with Duplicate Check
+  // ✅ Submit and Show Thank You Page
   function submitForm() {
     const email = document.getElementById("emailId").value.trim();
     const day = document.getElementById("daySelect").value;
+    const srn = document.getElementById("uniqueKeySelect").value;
 
-    if (!email || !day) {
-      alert("⚠ Please fill in Email ID and select Day before submitting.");
+    if (!email || !day || !srn) {
+      alert("⚠ Please fill in Email, select Day, and SRN before submitting.");
       return;
     }
 
@@ -356,6 +364,10 @@
 
     // Save submission
     saveSubmission(email, day);
+
+    // Remove SRN from list & refresh dropdown
+    availableSRNs = availableSRNs.filter(s => s !== srn);
+    populateSRNDropdown();
 
     // Show Thank You Page
     document.getElementById("page" + currentPage).classList.remove("active-page");
