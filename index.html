@@ -262,87 +262,109 @@
   document.addEventListener("DOMContentLoaded", showDailyQuote);
 </script>
 
-  <script>
-    let currentPage = 1;
+<script>
+  let currentPage = 1;
+  let usedSRNs = [];   // store submitted student keys
+  let usedDays = [];   // store submitted days
 
-    function nextPage() {
+  function nextPage() {
+    document.getElementById("page" + currentPage).classList.remove("active-page");
+    currentPage++;
+    document.getElementById("page" + currentPage).classList.add("active-page");
+  }
+
+  function prevPage() {
+    document.getElementById("page" + currentPage).classList.remove("active-page");
+    currentPage--;
+    document.getElementById("page" + currentPage).classList.add("active-page");
+  }
+
+  // ✅ Download Excel Template
+  function downloadTemplate() {
+    const wb = XLSX.utils.book_new();
+    const wsData = [["S.No", "SRN", "Name"]]; // Header row
+    const ws = XLSX.utils.aoa_to_sheet(wsData);
+    XLSX.utils.book_append_sheet(wb, ws, "Template");
+    XLSX.writeFile(wb, "Student_Template.xlsx");
+  }
+
+  // ✅ Handle Excel Upload
+  function handleFileUpload(event) {
+    const file = event.target.files[0];
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const data = new Uint8Array(e.target.result);
+      const workbook = XLSX.read(data, { type: "array" });
+      const sheetName = workbook.SheetNames[0];
+      const sheet = workbook.Sheets[sheetName];
+      const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+      // Extract SRN column (2nd column)
+      let srnList = [];
+      for (let i = 1; i < jsonData.length; i++) {
+        if (jsonData[i][1]) srnList.push(jsonData[i][1]);
+      }
+
+      populateSRNDropdown(srnList);
+      alert("✅ Student SRNs loaded successfully!");
+    };
+    reader.readAsArrayBuffer(file);
+  }
+
+  // ✅ Populate SRN Dropdown excluding already used
+  function populateSRNDropdown(srnList) {
+    const dropdown = document.getElementById("uniqueKeySelect");
+    dropdown.innerHTML = '<option value="">-- Select SRN --</option>';
+    srnList.forEach(srn => {
+      if (!usedSRNs.includes(srn)) {
+        const opt = document.createElement("option");
+        opt.value = srn;
+        opt.textContent = srn;
+        dropdown.appendChild(opt);
+      }
+    });
+  }
+
+  // ✅ Submit and Loop Students
+  function submitForm() {
+    const day = document.getElementById("daySelect").value;
+    const srn = document.getElementById("uniqueKeySelect").value;
+
+    if (!day || !srn) {
+      alert("⚠ Please select both Day and SRN before submitting.");
+      return;
+    }
+
+    // Freeze the selected day (esp. Day 1)
+    if (!usedDays.includes(day)) {
+      usedDays.push(day);
+      const daySelect = document.getElementById("daySelect");
+      for (let opt of daySelect.options) {
+        if (opt.value === day) opt.disabled = true;
+      }
+    }
+
+    // Remove SRN from future selection
+    usedSRNs.push(srn);
+    const dropdown = document.getElementById("uniqueKeySelect");
+    dropdown.querySelector(`option[value="${srn}"]`)?.remove();
+
+    // Go to Feedback Questions Page
+    nextPage();
+  }
+
+  // ✅ After feedback → loop back if students left
+  function finalizeGrade() {
+    const remainingOptions = document.getElementById("uniqueKeySelect").options.length;
+
+    if (remainingOptions > 1) {
+      // Still SRNs left → back to Page 2
       document.getElementById("page" + currentPage).classList.remove("active-page");
-      currentPage++;
+      currentPage = 2;
       document.getElementById("page" + currentPage).classList.add("active-page");
+    } else {
+      // No SRNs left → go to Thank You page
+      nextPage();
     }
-
-    function prevPage() {
-      document.getElementById("page" + currentPage).classList.remove("active-page");
-      currentPage--;
-      document.getElementById("page" + currentPage).classList.add("active-page");
-    }
-
-    // ✅ Download Excel Template
-    function downloadTemplate() {
-      const wb = XLSX.utils.book_new();
-      const wsData = [["S.No", "SRN", "Name"]]; // Header row
-      const ws = XLSX.utils.aoa_to_sheet(wsData);
-      XLSX.utils.book_append_sheet(wb, ws, "Template");
-      XLSX.writeFile(wb, "Student_Template.xlsx");
-    }
-
-    // ✅ Handle Excel Upload
-    function handleFileUpload(event) {
-      const file = event.target.files[0];
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        const data = new Uint8Array(e.target.result);
-        const workbook = XLSX.read(data, { type: "array" });
-        const sheetName = workbook.SheetNames[0];
-        const sheet = workbook.Sheets[sheetName];
-        const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-
-        // Extract SRN column (2nd column)
-        let srnList = [];
-        for (let i = 1; i < jsonData.length; i++) {
-          if (jsonData[i][1]) srnList.push(jsonData[i][1]);
-        }
-
-        // Populate dropdown
-        const dropdown = document.getElementById("uniqueKeySelect");
-        dropdown.innerHTML = '<option value="">-- Select SRN --</option>';
-        srnList.forEach(srn => {
-          const opt = document.createElement("option");
-          opt.value = srn;
-          opt.textContent = srn;
-          dropdown.appendChild(opt);
-        });
-
-        alert("✅ Student SRNs loaded successfully!");
-      };
-      reader.readAsArrayBuffer(file);
-    }
-
-    // ✅ Submit and Show Thank You Page with Quote
-    function submitForm() {
-      // Show Thank You Page
-      document.getElementById("page" + currentPage).classList.remove("active-page");
-      currentPage++;
-      document.getElementById("page" + currentPage).classList.add("active-page");
-
-      // Daily Motivational Quotes
-      const quotes = [
-        "Success is not final, failure is not fatal: it is the courage to continue that counts.",
-        "Believe you can and you're halfway there.",
-        "Don’t watch the clock; do what it does. Keep going.",
-        "Great things never come from comfort zones.",
-        "Push yourself, because no one else is going to do it for you.",
-        "Dream bigger. Do bigger.",
-        "Your limitation—it’s only your imagination.",
-        "Hard work beats talent when talent doesn’t work hard.",
-        "Don’t stop until you’re proud.",
-        "Doubt kills more dreams than failure ever will."
-      ];
-
-      const today = new Date();
-      const index = today.getDate() % quotes.length;
-      document.getElementById("quoteBox").innerText = quotes[index];
-    }
-  </script>
-</body>
-</html>
+  }
+</script>
