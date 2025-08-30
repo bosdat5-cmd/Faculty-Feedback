@@ -97,6 +97,22 @@
   </style>
 </head>
 <body>
+<script>
+  const emailInput = document.getElementById("emailId");
+  const daySelect = document.getElementById("daySelect");
+
+  // Add event listener when Day is selected
+  daySelect.addEventListener("change", () => {
+    const selectedDay = daySelect.value;
+
+    if (selectedDay === "Day 1" || selectedDay === "Day 2") {
+      emailInput.required = true;  // Make mandatory
+    } else {
+      emailInput.required = false; // Optional
+    }
+  });
+</script>
+
   <div class="container">
     <h2>THE INSTITUTE OF CHARTERED ACCOUNTANT OF INDIA</h2>
     <h3 style="text-align:center; color:#0077b6;">Faculty Feedback Form</h3>
@@ -313,5 +329,6 @@ function submitForm() {
 </script>
 </body>
 </html>
+
 
 
