@@ -112,34 +112,36 @@ daySelect.addEventListener("change", () => {
   }
 });
   // Modify submitForm to retain locked Day for all SRNs
-  function submitForm() {
+function submitForm() {
     const selectedSRN = document.getElementById("uniqueKeySelect").value;
     if (!selectedSRN) {
-      alert("Please select an SRN before submitting feedback!");
-      return;
+        alert("Please select an SRN before submitting feedback!");
+        return;
     }
 
-    // Remove submitted SRN
+    // Remove submitted SRN from global list
     srnListGlobal = srnListGlobal.filter(srn => srn !== selectedSRN);
+
+    // Reset SRN dropdown only (keep Day locked!)
     populateSRNDropdown();
 
-    // Reset feedback ratings
+    // Reset all feedback ratings
     document.querySelectorAll("#questionsContainer select").forEach(sel => sel.value = "");
 
     if (srnListGlobal.length > 0) {
-      // Keep Day locked, go back to SRN selection
-      document.getElementById("page" + currentPage).classList.remove("active-page");
-      currentPage = 2; // Page 2: Day & SRN selection
-      document.getElementById("page" + currentPage).classList.add("active-page");
-      alert(`✅ Feedback submitted for SRN: ${selectedSRN}. Please select the next SRN.`);
+        // More SRNs remaining → go back to Page 2 (SRN selection only)
+        document.getElementById("page" + currentPage).classList.remove("active-page");
+        currentPage = 2; // Page 2 = SRN & Day selection (Day stays locked)
+        document.getElementById("page" + currentPage).classList.add("active-page");
+        alert(`✅ Feedback submitted for SRN: ${selectedSRN}. Please select the next SRN.`);
     } else {
-      // All SRNs done → Thank You page
-      document.getElementById("page" + currentPage).classList.remove("active-page");
-      currentPage = 4;
-      document.getElementById("page" + currentPage).classList.add("active-page");
-      showDailyQuote();
+        // All SRNs done → show Thank You page
+        document.getElementById("page" + currentPage).classList.remove("active-page");
+        currentPage = 4; // Page 4 = Thank You
+        document.getElementById("page" + currentPage).classList.add("active-page");
+        showDailyQuote();
     }
-  }
+}
 </script>
 
   <div class="container">
@@ -323,7 +325,6 @@ function submitForm() {
 
     // Reset dropdown & day selection
     populateSRNDropdown();
-    document.getElementById("daySelect").value = "";
 
     // Reset all feedback ratings
     document.querySelectorAll("#questionsContainer select").forEach(sel => sel.value = "");
@@ -358,6 +359,7 @@ function submitForm() {
 </script>
 </body>
 </html>
+
 
 
 
