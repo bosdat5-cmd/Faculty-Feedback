@@ -97,209 +97,109 @@
   </style>
 </head>
 <body>
-  <div class="container">
-    <h2>THE INSTITUTE OF CHARTERED ACCOUNTANT OF INDIA</h2>
-    <h3 style="text-align:center; color:#0077b6; margin-top:-10px; margin-bottom:20px;">
-      Faculty Feedback Form
-    </h3>
-
-    <!-- Page 1: Basic Details -->
-    <div class="form-page active-page" id="page1">
-      <h3>Basic Details</h3>
-
-      <label>Faculty Name:</label>
-      <input type="text" id="facultyName" placeholder="Enter faculty name" required>
-
-      <label>Mobile Number:</label>
-      <input type="text" id="mobileNumber" placeholder="10-digit mobile" required>
-
-      <label>Email ID:</label>
-      <input type="email" id="emailId" placeholder="example@email.com" required>
-
-      <label>Batch ID:</label>
-      <input type="text" id="batchId" placeholder="Enter batch ID" required>
-
-      <h3>Student Data</h3>
-      <button class="btn" onclick="downloadTemplate()">📥 Download Excel Template</button>
-
-      <label style="margin-top:15px;">Upload Student Data File:</label>
-      <input type="file" id="excelFile" accept=".xlsx, .xls" onchange="handleFileUpload(event)">
-
-      <button class="btn" onclick="nextPage()">➡ Next</button>
-    </div>
-
-<!-- Page 2 -->
-    <div id="page2" class="form-page">
-      <h2>Select Day & SRN</h2>
-      <label for="daySelect">Day:</label>
-      <select id="daySelect">
-        <option value="">-- Select Day --</option>
-        <option value="Day 1">Day 1</option>
-        <option value="Day 2">Day 2</option>
-        <option value="Day 3">Day 3</option>
-      </select>
-
-      <label for="uniqueKeySelect">SRN:</label>
-      <select id="uniqueKeySelect">
-        <option value="">-- Select SRN --</option>
-        <option value="SRN001">SRN001</option>
-        <option value="SRN002">SRN002</option>
-        <option value="SRN003">SRN003</option>
-      </select>
-
-      <button class="btn" onclick="submitForm()">Proceed</button>
-    </div>
-<!-- Page 3: Session Feedback -->
-<div id="page3" class="form-page">
-  <h2 class="text-xl font-bold mb-4">Session Feedback</h2>
-
-  <!-- Day Dropdown -->
-  <label for="dayDropdown" class="block font-semibold mb-2">Day:</label>
-  <select id="dayDropdown" class="w-full p-2 border rounded mb-4" required>
-    <option value="">-- Select Day --</option>
-    <option value="Day 1">Day 1</option>
-    <option value="Day 2">Day 2</option>
-    <option value="Day 3">Day 3</option>
-    <option value="Day 4">Day 4</option>
-    <option value="Day 5">Day 5</option>
-    <option value="Day 6">Day 6</option>
-    <option value="Day 7">Day 7</option>
-    <option value="Day 8">Day 8</option>
-    <option value="Day 9">Day 9</option>
-    <option value="Day 10">Day 10</option>
-    <option value="Day 11">Day 11</option>
-    <option value="Day 12">Day 12</option>
-    <option value="Day 13">Day 13</option>
-    <option value="Day 14">Day 14</option>
-    <option value="Day 15">Day 15</option>
-  </select>
-
-  <!-- SRN Input -->
-  <label for="studentSRN" class="block font-semibold mb-2">Student Unique Key (SRN):</label>
-  <input type="text" id="studentSRN" class="w-full p-2 border rounded mb-4" placeholder="Enter SRN" required>
-
-  <!-- Buttons -->
-  <div class="flex justify-between mt-4">
-    <button type="button" class="bg-blue-600 text-white px-4 py-2 rounded" onclick="prevPage(2)">← Back</button>
-    <button type="button" class="bg-blue-600 text-white px-4 py-2 rounded" onclick="nextPage(4)">Submit</button>
-  </div>
-</div>
-    
 <script>
-  const questions = [
-    "Subject knowledge","Session planning & structure","Communication skills",
-    "Engagement & interaction","Innovative methods","Time management",
-    "Adherence to guidelines","Response to questions","Practical examples",
-    "Professional conduct","Technology use","Discipline",
-    "Student feedback","Contribution to growth","Overall impact"
-  ];
-
-  function renderQuestions() {
-    const container = document.getElementById("questionsContainer");
-    questions.forEach((q, i) => {
-      const block = document.createElement("div");
-      block.innerHTML = `
-        <label class="block mb-2">${i+1}. ${q}</label>
-        <select name="q${i+1}" class="ratingSelect w-full p-2 border rounded" required>
-          <option value="">-- Select Rating --</option>
-          <option value="20">1 - Poor (20)</option>
-          <option value="40">2 - Below Average (40)</option>
-          <option value="60">3 - Average (60)</option>
-          <option value="80">4 - Good (80)</option>
-          <option value="100">5 - Excellent (100)</option>
-        </select>
-      `;
-      container.appendChild(block);
-    });
-
-    // Attach live update listener
-    document.querySelectorAll(".ratingSelect").forEach(sel => {
-      sel.addEventListener("change", updateLiveScore);
-    });
-  }
-  document.addEventListener("DOMContentLoaded", renderQuestions);
-
-  function updateLiveScore() {
-    const selects = document.querySelectorAll("#questionsContainer select");
-    let total = 0, count = 0;
-    selects.forEach(sel => {
-      if (sel.value) {
-        total += parseInt(sel.value);
-        count++;
-      }
-    });
-
-    const avg = count ? total / count : 0;
-    document.getElementById("finalScore").innerText = avg.toFixed(2);
-
-    let grade = "-";
-    if (avg >= 85) grade = "A+";
-    else if (avg >= 70) grade = "A";
-    else if (avg >= 50) grade = "B+";
-    else if (avg >= 30) grade = "B";
-    else if (avg > 0) grade = "C";
-
-    document.getElementById("finalGrade").innerText = grade;
-  }
-
-  function finalizeGrade() {
-    // When user clicks Submit → go to next page
-    nextPage();
-  }
-</script>
-
-<!-- ================= PAGE 4: THANK YOU ================= -->
-<div class="form-page" id="page4">
-  <div class="text-center p-6">
-    <h2 class="text-2xl font-bold mb-4">Thank You!</h2>
-    <p class="text-lg mb-6">Your feedback has been successfully submitted.</p>
-
-    <!-- Daily Motivational Quote -->
-    <div class="bg-white shadow-md rounded-lg p-6 max-w-xl mx-auto mt-6">
-      <h3 class="text-xl font-semibold mb-2">✨ Daily Motivational Quote ✨</h3>
-      <p id="dailyQuote" class="italic text-gray-700"></p>
-    </div>
-  </div>
-</div>
-
-<script>
-  const quotes = [
-    "Success is not final, failure is not fatal: it is the courage to continue that counts.",
-    "The best way to predict the future is to create it.",
-    "Dream big. Start small. Act now.",
-    "Believe you can and you're halfway there.",
-    "Push yourself, because no one else is going to do it for you.",
-    "Great things never come from comfort zones."
-  ];
-  function showDailyQuote() {
-    const today = new Date().getDate();
-    document.getElementById("dailyQuote").innerText = quotes[today % quotes.length];
-  }
-  document.addEventListener("DOMContentLoaded", showDailyQuote);
-</script>
-
-<script>
-  let currentPage = 1;
-  let usedSRNs = [];   // store submitted student keys
-  let usedDays = [];   // store submitted days
   let allSRNs = [];    // store original SRNs from Excel
+  let usedSRNs = [];   // store submitted SRNs
 
-  function nextPage() {
-    document.getElementById("page" + currentPage).classList.remove("active-page");
-    currentPage++;
-    document.getElementById("page" + currentPage).classList.add("active-page");
+  // ✅ Go to specific page
+  function goToPage(pageNumber) {
+    document.querySelectorAll(".form-page").forEach(page => page.classList.remove("active-page"));
+    document.getElementById("page" + pageNumber).classList.add("active-page");
   }
 
-  function prevPage() {
-    document.getElementById("page" + currentPage).classList.remove("active-page");
-    currentPage--;
-    document.getElementById("page" + currentPage).classList.add("active-page");
+  // ✅ Save Email (Page 1)
+  function saveEmail() {
+    const email = document.getElementById("emailId").value.trim();
+    if (!email) {
+      alert("⚠ Please enter your Email ID");
+      return;
+    }
+    sessionStorage.setItem("userEmail", email);
+    goToPage(2);
+  }
+
+  // ✅ Save Day & SRN (Page 2)
+  function saveDaySRN() {
+    const day = document.getElementById("daySelect").value;
+    const srn = document.getElementById("srnSelect").value;
+    const email = sessionStorage.getItem("userEmail");
+
+    if (!day || !srn) {
+      alert("⚠ Please select both Day and SRN");
+      return;
+    }
+
+    // Track completed days per email
+    let emailData = JSON.parse(localStorage.getItem(email)) || { completedDays: [] };
+
+    if (emailData.completedDays.length >= 2) {
+      alert("⚠ This email has already submitted feedback for 2 days.");
+      return;
+    }
+    if (emailData.completedDays.includes(day)) {
+      alert(`⚠ You already submitted feedback for ${day}.`);
+      return;
+    }
+
+    // Save to session
+    sessionStorage.setItem("selectedDay", day);
+    sessionStorage.setItem("selectedSRN", srn);
+
+    goToPage(3);
+  }
+
+  // ✅ Final Submission (Page 3)
+  function finalizeGrade() {
+    const srn = sessionStorage.getItem("selectedSRN");
+    const day = sessionStorage.getItem("selectedDay");
+    const email = sessionStorage.getItem("userEmail");
+
+    if (!srn || !day || !email) {
+      alert("⚠ Missing data, please restart the form.");
+      return;
+    }
+
+    const submitBtn = document.getElementById("submitBtn");
+    submitBtn.innerHTML = "⏳ Submitting...";
+    submitBtn.disabled = true;
+
+    setTimeout(() => {
+      // Save completed day for this email
+      let emailData = JSON.parse(localStorage.getItem(email)) || { completedDays: [] };
+      if (!emailData.completedDays.includes(day)) {
+        emailData.completedDays.push(day);
+        localStorage.setItem(email, JSON.stringify(emailData));
+      }
+
+      // Remove SRN from dropdown
+      const srnSelect = document.getElementById("srnSelect");
+      for (let i = 0; i < srnSelect.options.length; i++) {
+        if (srnSelect.options[i].value === srn) {
+          srnSelect.remove(i);
+          break;
+        }
+      }
+
+      submitBtn.innerHTML = "✅ Submitted";
+      submitBtn.disabled = false;
+
+      // Next step
+      if (srnSelect.options.length > 1) {
+        goToPage(2);
+      } else {
+        if (emailData.completedDays.length >= 2) {
+          goToPage(4);
+        } else {
+          goToPage(2);
+        }
+      }
+    }, 1000);
   }
 
   // ✅ Download Excel Template
   function downloadTemplate() {
     const wb = XLSX.utils.book_new();
-    const wsData = [["S.No", "SRN", "Name"]]; // Header row
+    const wsData = [["S.No", "SRN", "Name"]];
     const ws = XLSX.utils.aoa_to_sheet(wsData);
     XLSX.utils.book_append_sheet(wb, ws, "Template");
     XLSX.writeFile(wb, "Student_Template.xlsx");
@@ -316,7 +216,6 @@
       const sheet = workbook.Sheets[sheetName];
       const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 
-      // Extract SRN column (2nd column)
       allSRNs = [];
       for (let i = 1; i < jsonData.length; i++) {
         if (jsonData[i][1]) allSRNs.push(jsonData[i][1]);
@@ -328,9 +227,9 @@
     reader.readAsArrayBuffer(file);
   }
 
-  // ✅ Populate SRN Dropdown excluding already used
+  // ✅ Populate SRN Dropdown
   function populateSRNDropdown() {
-    const dropdown = document.getElementById("uniqueKeySelect");
+    const dropdown = document.getElementById("srnSelect");
     dropdown.innerHTML = '<option value="">-- Select SRN --</option>';
     allSRNs.forEach(srn => {
       if (!usedSRNs.includes(srn)) {
@@ -341,100 +240,8 @@
       }
     });
   }
-
-  // ✅ Submit Day & SRN (Page 2)
-function submitForm() {
-  const day = document.getElementById("daySelect").value;
-  const srn = document.getElementById("srnSelect").value;
-  const email = document.getElementById("emailId").value;
-
-  if (!email) {
-    alert("⚠ Email is mandatory!");
-    return;
-  }
-
-  // ✅ Track days per email
-  let emailData = JSON.parse(localStorage.getItem(email)) || { completedDays: [] };
-
-  // If already 2 days completed → block
-  if (emailData.completedDays.length >= 2) {
-    alert("⚠ This email has already submitted feedback for 2 days.");
-    return;
-  }
-
-  // If this day already done → block
-  if (emailData.completedDays.includes(day)) {
-    alert(`⚠ You already submitted feedback for ${day} with this email.`);
-    return;
-  }
-
-  // Save chosen day + srn
-  sessionStorage.setItem("selectedDay", day);
-  sessionStorage.setItem("selectedSRN", srn);
-
-  // ✅ Disable only the chosen option, NOT the whole dropdown
-  let daySelect = document.getElementById("daySelect");
-  for (let opt of daySelect.options) {
-    if (opt.value === day) {
-      opt.disabled = true;
-    }
-  }
-
-  nextPage();
-}
-
-  // ✅ After feedback → Submit with loading
-  function finalizeGrade() {
-  const srn = sessionStorage.getItem("selectedSRN");
-  const day = sessionStorage.getItem("selectedDay");
-  const email = document.getElementById("emailId").value;
-
-  if (!srn || !day || !email) {
-    alert("⚠ Missing data, please restart the form.");
-    return;
-  }
-
-  // Show submitting state
-  const submitBtn = document.querySelector("#page3 .btn");
-  submitBtn.innerHTML = "⏳ Submitting...";
-  submitBtn.disabled = true;
-
-  setTimeout(() => {
-    // ✅ Save completed day for this email
-    let emailData = JSON.parse(localStorage.getItem(email)) || { completedDays: [] };
-    if (!emailData.completedDays.includes(day)) {
-      emailData.completedDays.push(day);
-      localStorage.setItem(email, JSON.stringify(emailData));
-    }
-
-    // ✅ Remove SRN from dropdown
-    const srnSelect = document.getElementById("srnSelect");
-    for (let i = 0; i < srnSelect.options.length; i++) {
-      if (srnSelect.options[i].value === srn) {
-        srnSelect.remove(i);
-        break;
-      }
-    }
-
-    // Reset button
-    submitBtn.innerHTML = "✅ Submitted";
-    submitBtn.disabled = false;
-
-    // ✅ If more SRNs left → go back to Page 2
-    if (srnSelect.options.length > 0) {
-      goToPage(2);
-    } else {
-      // ✅ If 2 days completed → show Thank You
-      if (emailData.completedDays.length >= 2) {
-        goToPage(4);
-      } else {
-        // Otherwise still can pick next day later
-        goToPage(2);
-      }
-    }
-  }, 1000);
-}
 </script>
+
 
 
 
