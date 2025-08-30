@@ -98,15 +98,49 @@
 </head>
 <body>
 <script>
-const daySelect = document.getElementById("daySelect");
-const emailInput = document.getElementById("emailId");
+document.addEventListener("DOMContentLoaded", () => {
+  const daySelect = document.getElementById("daySelect");
+  const emailInput = document.getElementById("emailId");
 
-// Automatically select Day 1 and lock the dropdown
-daySelect.value = "Day 1";
-daySelect.disabled = true;
+  // Automatically select Day 1 and lock the dropdown
+  daySelect.value = "Day 1";
+  daySelect.disabled = true;
 
-// Make email required for Day 1
-emailInput.required = true;
+  // Make email required for Day 1
+  emailInput.required = true;
+});
+
+// Submit feedback function
+function submitForm() {
+    const selectedSRN = document.getElementById("uniqueKeySelect").value;
+    if (!selectedSRN) {
+        alert("Please select an SRN before submitting feedback!");
+        return;
+    }
+
+    // Remove submitted SRN from global list
+    srnListGlobal = srnListGlobal.filter(srn => srn !== selectedSRN);
+
+    // Reset SRN dropdown only, DO NOT reset Day
+    populateSRNDropdown();
+
+    // Reset all feedback ratings
+    document.querySelectorAll("#questionsContainer select").forEach(sel => sel.value = "");
+
+    if (srnListGlobal.length > 0) {
+        // More SRNs remaining → go back to Page 2 explicitly
+        document.getElementById("page" + currentPage).classList.remove("active-page");
+        currentPage = 2; // force Page 2
+        document.getElementById("page" + currentPage).classList.add("active-page");
+        alert(`✅ Feedback submitted for SRN: ${selectedSRN}. Please select the next SRN.`);
+    } else {
+        // All SRNs done → show Thank You page
+        document.getElementById("page" + currentPage).classList.remove("active-page");
+        currentPage = 4; // Page 4 = Thank You
+        document.getElementById("page" + currentPage).classList.add("active-page");
+        showDailyQuote();
+    }
+}
 </script>
 
   <div class="container">
@@ -324,6 +358,7 @@ function submitForm() {
 </script>
 </body>
 </html>
+
 
 
 
