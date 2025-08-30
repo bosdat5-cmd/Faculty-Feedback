@@ -230,22 +230,20 @@ function showDailyQuote() {
 }
 
 // Populate Available Days
-async function populateAvailableDays() {
-  const email = document.getElementById("emailId").value.trim();
-  if(!email){ alert("Enter Email first"); return; }
-
-  const resp = await fetch(`YOUR_WEB_APP_URL/getAvailableDays?email=${encodeURIComponent(email)}`);
-  const availableDays = await resp.json();
-
+// Populate Available Days (1 to 15)
+function populateAvailableDays() {
   const daySelect = document.getElementById("lockDaySelect");
   daySelect.innerHTML = '<option value="">-- Select Day --</option>';
-  availableDays.forEach(day=>{
+
+  // Pre-fill days 1 to 15
+  for (let i = 1; i <= 15; i++) {
     const opt = document.createElement("option");
-    opt.value = day;
-    opt.textContent = day;
+    opt.value = i;
+    opt.textContent = "Day " + i;
     daySelect.appendChild(opt);
-  });
+  }
 }
+
 
 // Lock Selected Day
 async function lockSelectedDay() {
@@ -266,3 +264,4 @@ document.addEventListener("DOMContentLoaded", renderQuestions);
 </script>
 </body>
 </html>
+
