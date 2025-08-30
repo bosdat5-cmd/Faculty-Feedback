@@ -107,6 +107,8 @@ input:focus, select:focus { border-color:#00b4d8; box-shadow:0 0 6px rgba(0,180,
 </div>
 
 <script>
+const webAppURL = "YOUR_DEPLOYED_APP_SCRIPT_URL_HERE"; // 🔹 Replace with your Apps Script Web App URL
+
 let currentPage = 1;
 let srnListGlobal = [];
 let lockedDay = "";
@@ -129,38 +131,39 @@ const branchesMap = {
   "FRO":["Dubai"]
 };
 
+// --- Populate branches ---
 function updateBranches() {
   const region = document.getElementById("regionSelect").value;
   const branchSelect = document.getElementById("branchSelect");
   branchSelect.innerHTML = '<option value="">-- Select Branch --</option>';
   if(branchesMap[region]){
-    branchesMap[region].forEach(branch => {
-      const opt = document.createElement("option");
-      opt.value = branch;
-      opt.textContent = branch;
+    branchesMap[region].forEach(branch=>{
+      const opt=document.createElement("option");
+      opt.value=branch;
+      opt.textContent=branch;
       branchSelect.appendChild(opt);
     });
   }
 }
 
-// Populate day dropdown for Page 1
-function populateDayDropdown() {
-  const daySelect = document.getElementById("lockDaySelect");
+// --- Populate day dropdown ---
+function populateDayDropdown(){
+  const daySelect=document.getElementById("lockDaySelect");
   for(let i=1;i<=15;i++){
-    const opt = document.createElement("option");
-    opt.value = i;
-    opt.textContent = "Day " + i;
+    const opt=document.createElement("option");
+    opt.value=i;
+    opt.textContent="Day "+i;
     daySelect.appendChild(opt);
   }
 }
 
-// Render Questions
-function renderQuestions() {
-  const container = document.getElementById("questionsContainer");
-  container.innerHTML = "";
-  questions.forEach((q, i) => {
-    const block = document.createElement("div");
-    block.innerHTML = `<label>${i+1}. ${q}</label>
+// --- Render Questions ---
+function renderQuestions(){
+  const container=document.getElementById("questionsContainer");
+  container.innerHTML="";
+  questions.forEach((q,i)=>{
+    const block=document.createElement("div");
+    block.innerHTML=`<label>${i+1}. ${q}</label>
     <select class="ratingSelect" required>
       <option value="">-- Select Rating --</option>
       <option value="20">1 - Poor</option>
@@ -171,108 +174,101 @@ function renderQuestions() {
     </select>`;
     container.appendChild(block);
   });
-  document.querySelectorAll(".ratingSelect").forEach(sel => sel.addEventListener("change", updateLiveScore));
+  document.querySelectorAll(".ratingSelect").forEach(sel=>sel.addEventListener("change",updateLiveScore));
 }
 
-function updateLiveScore() {
-  const selects = document.querySelectorAll(".ratingSelect");
-  let total = 0, count = 0;
-  selects.forEach(sel => { if(sel.value){ total += parseInt(sel.value); count++; }});
-  const avg = count ? total / count : 0;
-  document.getElementById("finalScore").innerText = avg.toFixed(2);
-  let grade = "-";
-  if(avg >= 85) grade="A+"; else if(avg >=70) grade="A"; else if(avg >=50) grade="B+"; else if(avg >=30) grade="B"; else if(avg>0) grade="C";
-  document.getElementById("finalGrade").innerText = grade;
+function updateLiveScore(){
+  const selects=document.querySelectorAll(".ratingSelect");
+  let total=0,count=0;
+  selects.forEach(sel=>{if(sel.value){total+=parseInt(sel.value);count++;}});
+  const avg=count?total/count:0;
+  document.getElementById("finalScore").innerText=avg.toFixed(2);
+  let grade="-";
+  if(avg>=85) grade="A+"; else if(avg>=70) grade="A"; else if(avg>=50) grade="B+"; else if(avg>=30) grade="B"; else if(avg>0) grade="C";
+  document.getElementById("finalGrade").innerText=grade;
 }
 
-// Excel template
-function downloadTemplate() {
-  const wb = XLSX.utils.book_new();
-  const ws = XLSX.utils.aoa_to_sheet([["S.No","SRN","Name"]]);
-  XLSX.utils.book_append_sheet(wb, ws, "Template");
+// --- Excel Template ---
+function downloadTemplate(){
+  const wb=XLSX.utils.book_new();
+  const ws=XLSX.utils.aoa_to_sheet([["S.No","SRN","Name"]]);
+  XLSX.utils.book_append_sheet(wb,ws,"Template");
   XLSX.writeFile(wb,"Student_Template.xlsx");
 }
 
-// Handle file upload
-function handleFileUpload(event) {
-  const file = event.target.files[0];
-  const reader = new FileReader();
-
-  reader.onload = function(e) {
-    const data = new Uint8Array(e.target.result);
-    const workbook = XLSX.read(data,{type:"array"});
-    const sheet = workbook.Sheets[workbook.SheetNames[0]];
-    const jsonData = XLSX.utils.sheet_to_json(sheet,{header:1});
-
-    srnListGlobal = [];
-    for(let i=1;i<jsonData.length;i++) {
+// --- Handle file upload ---
+function handleFileUpload(event){
+  const file=event.target.files[0];
+  const reader=new FileReader();
+  reader.onload=function(e){
+    const data=new Uint8Array(e.target.result);
+    const workbook=XLSX.read(data,{type:"array"});
+    const sheet=workbook.Sheets[workbook.SheetNames[0]];
+    const jsonData=XLSX.utils.sheet_to_json(sheet,{header:1});
+    srnListGlobal=[];
+    for(let i=1;i<jsonData.length;i++){
       if(jsonData[i][1]){
-        srnListGlobal.push({ value: jsonData[i][1].toString().trim(), completed: false });
+        srnListGlobal.push({value:jsonData[i][1].toString().trim(),completed:false});
       }
     }
     alert("✅ Student SRNs loaded!");
   }
-
   reader.readAsArrayBuffer(file);
 }
 
-// Lock day in both pages
+// --- Lock Day ---
 function lockDayForPages(selectedDay){
   lockedDay = selectedDay;
   document.getElementById("lockDaySelect").value = lockedDay;
-  document.getElementById("lockDaySelect").disabled = true;
-
+  document.getElementById("lockDaySelect").disabled = true; // lock
   document.getElementById("daySelect").innerHTML = `<option value="${lockedDay}">Day ${lockedDay}</option>`;
   document.getElementById("daySelect").disabled = true;
 }
 
-// Update SRNs in Page 2 dropdown
+// --- Update SRNs ---
 function updateSRNsForPage2(){
-  const srnSelect = document.getElementById("uniqueKeySelect");
-  srnSelect.innerHTML = '<option value="">-- Select SRN --</option>';
-  srnListGlobal.forEach(srnObj => {
+  const srnSelect=document.getElementById("uniqueKeySelect");
+  srnSelect.innerHTML='<option value="">-- Select SRN --</option>';
+  srnListGlobal.forEach(srnObj=>{
     if(!srnObj.completed){
-      const opt = document.createElement("option");
-      opt.value = srnObj.value;
-      opt.textContent = srnObj.value;
+      const opt=document.createElement("option");
+      opt.value=srnObj.value;
+      opt.textContent=srnObj.value;
       srnSelect.appendChild(opt);
     }
   });
 }
 
-// Start feedback from Page 1
-function startFeedback() {
-  if(!srnListGlobal.length){ alert("Upload student data first"); return; }
-  const selectedDay = document.getElementById("lockDaySelect").value;
-  if(!selectedDay && !lockedDay){ alert("Select a day"); return; }
-
-  lockDayForPages(selectedDay);  // Lock day in Page 1 & 2
-  updateSRNsForPage2();          // Populate SRNs in Page 2
-
+// --- Start Feedback ---
+function startFeedback(){
+  if(!srnListGlobal.length){alert("Upload student data first");return;}
+  const selectedDay=document.getElementById("lockDaySelect").value;
+  if(!selectedDay && !lockedDay){alert("Select a day");return;}
+  lockDayForPages(selectedDay);
+  updateSRNsForPage2();
   showPage(2);
 }
 
-// Navigate from Page 2 to Page 3
-function startSRNFeedback() {
-  const srnSelect = document.getElementById("uniqueKeySelect").value;
-  if(!srnSelect){ alert("Select a SRN to continue"); return; }
-
-  currentSRNIndex = srnListGlobal.findIndex(s => s.value === srnSelect);
+// --- Start SRN Feedback ---
+function startSRNFeedback(){
+  const srnSelect=document.getElementById("uniqueKeySelect").value;
+  if(!srnSelect){alert("Select a SRN to continue");return;}
+  currentSRNIndex=srnListGlobal.findIndex(s=>s.value===srnSelect);
   loadSRN(currentSRNIndex);
   showPage(3);
 }
 
-// Load SRN into Page 3 heading
-function loadSRN(index) {
+// --- Load SRN ---
+function loadSRN(index){
   if(srnListGlobal[index]){
-    document.getElementById("feedbackHeading").innerText = `Feedback Questions - SRN: ${srnListGlobal[index].value}`;
-    document.querySelectorAll(".ratingSelect").forEach(sel => sel.value="");
+    document.getElementById("feedbackHeading").innerText=`Feedback Questions - SRN: ${srnListGlobal[index].value}`;
+    document.querySelectorAll(".ratingSelect").forEach(sel=>sel.value="");
     updateLiveScore();
   }
 }
 
-// Submit feedback
-function submitFeedback() {
+// --- Submit Feedback ---
+async function submitFeedback(){
   if(!srnListGlobal[currentSRNIndex]) return;
 
   const selects = document.querySelectorAll(".ratingSelect");
@@ -280,38 +276,69 @@ function submitFeedback() {
     if(!sel.value){ alert("Please rate all questions"); return; }
   }
 
-  srnListGlobal[currentSRNIndex].completed = true;
+  const payload = {
+    facultyName: document.getElementById("facultyName").value,
+    mobile: document.getElementById("mobileNumber").value,
+    email: document.getElementById("emailId").value,
+    batchId: document.getElementById("batchId").value,
+    region: document.getElementById("regionSelect").value,
+    branch: document.getElementById("branchSelect").value,
+    day: lockedDay,
+    srn: srnListGlobal[currentSRNIndex].value,
+    ratings: Array.from(selects).map(s => s.value),
+    score: document.getElementById("finalScore").innerText,
+    grade: document.getElementById("finalGrade").innerText
+  };
 
-  const remaining = srnListGlobal.filter(s => !s.completed);
-  if(remaining.length > 0){
-    currentSRNIndex = srnListGlobal.findIndex(s => !s.completed);
-    loadSRN(currentSRNIndex);
-    updateSRNsForPage2(); // Update remaining SRNs in Page 2
-    alert("✅ Feedback submitted! Next SRN loaded.");
-  } else {
-    showPage(4);
-    showDailyQuote();
+  try {
+const response = await fetch("https://script.google.com/macros/s/AKfycbzoHUoC1r7q3C1t5AMkMLkdQzL0GZQEJ5xflcxbNrTcvpDSQPyIj36jLyAZEoMBltbysQ/exec", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify(payload)
+});
+
+    const result = await response.json();
+
+    if(result.status === "success") {
+      srnListGlobal[currentSRNIndex].completed = true;
+      const remaining = srnListGlobal.filter(s => !s.completed);
+      if(remaining.length > 0){
+        currentSRNIndex = srnListGlobal.findIndex(s => !s.completed);
+        loadSRN(currentSRNIndex);
+        updateSRNsForPage2();
+        alert("✅ Feedback submitted! Next SRN loaded.");
+      } else {
+        showPage(4);
+        showDailyQuote();
+      }
+    } else {
+      alert("Error: " + result.message);
+    }
+
+  } catch(err){
+    alert("Submission failed: " + err.message);
   }
 }
 
-// Navigate to previous SRN
-function prevPage3() {
-  const prevIndex = srnListGlobal.slice(0,currentSRNIndex).reverse().findIndex(s => s.completed);
-  if(prevIndex === -1){ alert("No previous SRN"); return; }
-  currentSRNIndex = currentSRNIndex - prevIndex - 1;
+
+// --- Previous SRN ---
+function prevPage3(){
+  const prevIndex=srnListGlobal.slice(0,currentSRNIndex).reverse().findIndex(s=>s.completed);
+  if(prevIndex===-1){alert("No previous SRN"); return;}
+  currentSRNIndex=currentSRNIndex-prevIndex-1;
   loadSRN(currentSRNIndex);
 }
 
-// Show specific page
+// --- Show Page ---
 function showPage(pageNum){
-  document.querySelectorAll(".form-page").forEach(p => p.classList.remove("active-page"));
+  document.querySelectorAll(".form-page").forEach(p=>p.classList.remove("active-page"));
   document.getElementById("page"+pageNum).classList.add("active-page");
-  currentPage = pageNum;
+  currentPage=pageNum;
 }
 
-// Daily Quote
-function showDailyQuote() {
-  const quotes = [
+// --- Daily Quote ---
+function showDailyQuote(){
+  const quotes=[
     "Success is not final, failure is not fatal: it is the courage to continue that counts.",
     "The best way to predict the future is to create it.",
     "Dream big. Start small. Act now.",
@@ -319,14 +346,15 @@ function showDailyQuote() {
     "Push yourself, because no one else is going to do it for you.",
     "Great things never come from comfort zones."
   ];
-  const today = new Date().getDate();
-  document.getElementById("dailyQuote").innerText = quotes[today%quotes.length];
+  const today=new Date().getDate();
+  document.getElementById("dailyQuote").innerText=quotes[today%quotes.length];
 }
 
-// Initialize
+// --- Initialize ---
 document.addEventListener("DOMContentLoaded", () => {
   renderQuestions();
   populateDayDropdown();
+  updateBranches(); // ensures branches dropdown populates if region is selected
 });
 </script>
 </body>
