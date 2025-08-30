@@ -101,28 +101,16 @@
   const emailInput = document.getElementById("emailId");
   const daySelect = document.getElementById("daySelect");
 
-  // Flag to track if Day is locked
-  let isDayLocked = false;
+let selectedDayValue = null; // stores the Day
 
-  daySelect.addEventListener("change", () => {
-    const selectedDay = daySelect.value;
-
-    if (!selectedDay) return; // Do nothing if no day selected
-
-    // Make email mandatory for Day 1 and Day 2
-    if (selectedDay === "Day 1" || selectedDay === "Day 2") {
-      emailInput.required = true;
-    } else {
-      emailInput.required = false;
-    }
-
-    // Lock the day selection
-    if (!isDayLocked) {
-      daySelect.disabled = true;
-      isDayLocked = true;
-    }
-  });
-
+daySelect.addEventListener("change", () => {
+  if (!selectedDayValue) {
+    selectedDayValue = daySelect.value; // save selected day
+    daySelect.disabled = true;          // lock the Day
+    // Make email required only for Day 1 and Day 2
+    emailInput.required = selectedDayValue === "Day 1" || selectedDayValue === "Day 2";
+  }
+});
   // Modify submitForm to retain locked Day for all SRNs
   function submitForm() {
     const selectedSRN = document.getElementById("uniqueKeySelect").value;
@@ -370,6 +358,7 @@ function submitForm() {
 </script>
 </body>
 </html>
+
 
 
 
