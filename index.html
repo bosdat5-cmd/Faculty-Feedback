@@ -128,29 +128,27 @@
       <button class="btn" onclick="nextPage()">➡ Next</button>
     </div>
 
-    <!-- Page 2: Session Feedback -->
-    <div class="form-page" id="page2">
-      <h3>Session Feedback</h3>
-
-      <label>Day:</label>
-      <select id="daySelect" disabled></select>
+<!-- Page 2 -->
+    <div id="page2" class="form-page">
+      <h2>Select Day & SRN</h2>
+      <label for="daySelect">Day:</label>
+      <select id="daySelect">
         <option value="">-- Select Day --</option>
-        <option>Day 1</option><option>Day 2</option><option>Day 3</option>
-        <option>Day 4</option><option>Day 5</option><option>Day 6</option>
-        <option>Day 7</option><option>Day 8</option><option>Day 9</option>
-        <option>Day 10</option><option>Day 11</option><option>Day 12</option>
-        <option>Day 13</option><option>Day 14</option><option>Day 15</option>
+        <option value="Day 1">Day 1</option>
+        <option value="Day 2">Day 2</option>
+        <option value="Day 3">Day 3</option>
       </select>
 
-      <label>Student Unique Key (SRN):</label>
+      <label for="uniqueKeySelect">SRN:</label>
       <select id="uniqueKeySelect">
         <option value="">-- Select SRN --</option>
+        <option value="SRN001">SRN001</option>
+        <option value="SRN002">SRN002</option>
+        <option value="SRN003">SRN003</option>
       </select>
 
-      <button class="btn" onclick="prevPage()">⬅ Back</button>
-      <button class="btn" onclick="submitForm()">✅ Submit</button>
+      <button class="btn" onclick="submitForm()">Proceed</button>
     </div>
-
 <!-- ================= PAGE 3: FEEDBACK QUESTIONS ================= -->
 <div class="form-page" id="page3">
   <h2 class="text-xl font-semibold mb-4 text-center">Feedback Questions</h2>
@@ -419,6 +417,7 @@ function submitForm() {
   }, 1000);
 }
 </script>
+
 
 
 
