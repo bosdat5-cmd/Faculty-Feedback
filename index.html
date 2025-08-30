@@ -94,7 +94,7 @@ input:focus, select:focus { border-color:#00b4d8; box-shadow:0 0 6px rgba(0,180,
 <script>
 let currentPage = 1;
 let srnListGlobal = [];
-let lockedDay = ""; // Will lock only after first feedback
+let lockedDay = ""; 
 const questions = [
   "Subject knowledge","Session planning & structure","Communication skills",
   "Engagement & interaction","Innovative methods","Time management",
@@ -159,7 +159,6 @@ function prevPage() {
 }
 
 // Page 1 Next
-// Page 1 Next
 function nextPage1() {
   if(!srnListGlobal.length){ alert("Upload student data first"); return; }
 
@@ -169,18 +168,65 @@ function nextPage1() {
     return; 
   }
 
-  // If day is already locked from previous feedback, keep it disabled
+  // Lock day if not already locked
   if(!lockedDay){
     lockedDay = selectedDay;
   }
-  document.getElementById("lockDaySelect").value = lockedDay;
-  document.getElementById("lockDaySelect").disabled = true; // Lock on Page 1
 
+  // Disable day dropdowns on both pages
+  document.getElementById("lockDaySelect").value = lockedDay;
+  document.getElementById("lockDaySelect").disabled = true;
   const dayDropdown = document.getElementById("daySelect");
   dayDropdown.innerHTML = `<option value="${lockedDay}">Day ${lockedDay}</option>`;
-  dayDropdown.disabled = true; // Lock on Page 2 as well
+  dayDropdown.disabled = true;
 
   nextPage();
+}
+
+// Excel template
+function downloadTemplate() {
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.aoa_to_sheet([["S.No","SRN","Name"]]);
+  XLSX.utils.book_append_sheet(wb, ws, "Template");
+  XLSX.writeFile(wb,"Student_Template.xlsx");
+}
+
+// Handle file upload
+function handleFileUpload(event) {
+  const file = event.target.files[0];
+  const reader = new FileReader();
+
+  reader.onload = function(e) {
+    const data = new Uint8Array(e.target.result);
+    const workbook = XLSX.read(data,{type:"array"});
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+    const jsonData = XLSX.utils.sheet_to_json(sheet,{header:1});
+
+    srnListGlobal = [];
+    for(let i=1;i<jsonData.length;i++) {
+      if(jsonData[i][1]){
+        srnListGlobal.push({ value: jsonData[i][1], completed: false });
+      }
+    }
+    populateSRNDropdown();
+    alert("✅ Student SRNs loaded!");
+  }
+
+  reader.readAsArrayBuffer(file);
+}
+
+// Populate SRN dropdown
+function populateSRNDropdown() {
+  const dropdown = document.getElementById("uniqueKeySelect");
+  dropdown.innerHTML = '<option value="">-- Select SRN --</option>';
+  srnListGlobal.forEach(srn => {
+    if(!srn.completed){
+      const opt = document.createElement("option");
+      opt.value = srn.value;
+      opt.textContent = srn.value;
+      dropdown.appendChild(opt);
+    }
+  });
 }
 
 // Submit feedback
@@ -188,12 +234,13 @@ function submitForm() {
   const selectedSRN = document.getElementById("uniqueKeySelect").value;
   if(!selectedSRN){ alert("Select SRN"); return; }
 
+  // Mark SRN as completed
   srnListGlobal = srnListGlobal.map(srn => srn.value === selectedSRN ? { ...srn, completed:true } : srn );
   populateSRNDropdown();
 
   document.querySelectorAll(".ratingSelect").forEach(sel=>sel.value="");
 
-  // Ensure day is locked on both pages
+  // Lock day dropdowns
   document.getElementById("lockDaySelect").disabled = true;
   document.getElementById("daySelect").disabled = true;
 
@@ -232,4 +279,3 @@ document.addEventListener("DOMContentLoaded", () => {
 </script>
 </body>
 </html>
-
