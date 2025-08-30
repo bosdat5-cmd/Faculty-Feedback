@@ -9,11 +9,8 @@
 body {
   font-family: 'Poppins', sans-serif;
   background: linear-gradient(135deg, #0077b6, #00b4d8);
-  margin: 0;
-  padding: 0;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
+  margin: 0; padding: 0;
+  display: flex; justify-content: center; align-items: flex-start;
   min-height: 100vh;
 }
 .container {
@@ -25,32 +22,24 @@ body {
   box-shadow: 0 6px 20px rgba(0,0,0,0.15);
   animation: fadeIn 0.5s ease-in-out;
 }
-h2 {
-  text-align: center;
-  color: #023e8a;
-  margin-bottom: 20px;
-  font-weight: 600;
-}
+h2 { text-align: center; color: #023e8a; margin-bottom: 20px; font-weight: 600; }
 h3 { color: #0077b6; margin-bottom: 15px; }
 label { font-weight: 500; display: block; margin: 8px 0 5px; color: #333; }
 input, select {
-  width: 100%; padding: 10px; border: 1px solid #ccc;
-  border-radius: 10px; outline: none; font-size: 14px; margin-bottom: 15px;
-  transition: all 0.3s;
+  width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 10px;
+  outline: none; font-size: 14px; margin-bottom: 15px; transition: all 0.3s;
 }
 input:focus, select:focus { border-color: #00b4d8; box-shadow: 0 0 6px rgba(0,180,216,0.5); }
 .btn {
-  display: inline-block; background: #0077b6; color: #fff; border: none;
-  border-radius: 10px; padding: 10px 18px; font-size: 14px; font-weight: 500;
-  cursor: pointer; margin: 5px 5px 0 0; transition: all 0.3s;
+  display: inline-block; background: #0077b6; color: #fff;
+  border: none; border-radius: 10px; padding: 10px 18px;
+  font-size: 14px; font-weight: 500; cursor: pointer; margin: 5px 5px 0 0;
+  transition: all 0.3s;
 }
 .btn:hover { background: #023e8a; transform: scale(1.05); }
 .form-page { display: none; }
 .active-page { display: block; }
-.quote-box {
-  background: #f1faff; padding: 20px; border-left: 5px solid #00b4d8;
-  margin-top: 20px; border-radius: 10px; font-style: italic; color: #333;
-}
+.quote-box { background: #f1faff; padding: 20px; border-left: 5px solid #00b4d8; margin-top: 20px; border-radius: 10px; font-style: italic; color: #333; }
 .thankyou { text-align: center; color: #023e8a; font-size: 18px; font-weight: 600; margin-top: 10px; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 </style>
@@ -65,18 +54,19 @@ input:focus, select:focus { border-color: #00b4d8; box-shadow: 0 0 6px rgba(0,18
   <div class="form-page active-page" id="page1">
     <h3>Basic Details</h3>
     <label>Faculty Name:</label>
-    <input type="text" id="facultyName" placeholder="Enter faculty name" required>
+    <input type="text" id="facultyName" placeholder="Enter faculty name" required><br>
     <label>Mobile Number:</label>
-    <input type="text" id="mobileNumber" placeholder="10-digit mobile" required>
+    <input type="text" id="mobileNumber" placeholder="10-digit mobile" required><br>
     <label>Email ID:</label>
-    <input type="email" id="emailId" placeholder="example@email.com" required>
+    <input type="email" id="emailId" placeholder="example@email.com" required><br>
     <label>Batch ID:</label>
-    <input type="text" id="batchId" placeholder="Enter batch ID" required>
+    <input type="text" id="batchId" placeholder="Enter batch ID" required><br><br>
 
     <h3>Student Data</h3>
-    <button class="btn" onclick="downloadTemplate()">📥 Download Excel Template</button>
+    <button class="btn" onclick="downloadTemplate()">📥 Download Excel Template</button><br><br>
     <label>Upload Student Data File:</label>
-    <input type="file" id="excelFile" accept=".xlsx, .xls" onchange="handleFileUpload(event)">
+    <input type="file" id="excelFile" accept=".xlsx, .xls" onchange="handleFileUpload(event)"><br><br>
+
     <button class="btn" onclick="nextPage()">➡ Next</button>
   </div>
 
@@ -91,12 +81,12 @@ input:focus, select:focus { border-color: #00b4d8; box-shadow: 0 0 6px rgba(0,18
       <option>Day 7</option><option>Day 8</option><option>Day 9</option>
       <option>Day 10</option><option>Day 11</option><option>Day 12</option>
       <option>Day 13</option><option>Day 14</option><option>Day 15</option>
-    </select>
+    </select><br><br>
 
     <label>Student Unique Key (SRN):</label>
     <select id="uniqueKeySelect">
       <option value="">-- Select SRN --</option>
-    </select>
+    </select><br><br>
 
     <button class="btn" onclick="prevPage()">⬅ Back</button>
     <button class="btn" onclick="nextPage()">✅ Next</button>
@@ -105,14 +95,14 @@ input:focus, select:focus { border-color: #00b4d8; box-shadow: 0 0 6px rgba(0,18
   <!-- Page 3 -->
   <div class="form-page" id="page3">
     <h2 class="text-xl font-semibold mb-4 text-center">Feedback Questions</h2>
-    <div id="questionsContainer"></div>
+    <div id="questionsContainer" class="space-y-4"></div>
     <div id="resultBox" class="mt-6 p-4 border rounded bg-gray-100">
       <p class="text-lg font-semibold">Weightage Score: <span id="finalScore">0</span></p>
       <p class="text-lg font-semibold">Grade: <span id="finalGrade">-</span></p>
     </div>
     <div class="flex justify-between mt-6">
       <button type="button" onclick="prevPage()" class="bg-gray-500 text-white px-4 py-2 rounded">Back</button>
-      <button type="button" onclick="submitForm()" class="bg-blue-600 text-white px-4 py-2 rounded">Submit</button>
+      <button type="button" onclick="submitForm()" id="submitBtn" class="bg-blue-600 text-white px-4 py-2 rounded">Submit</button>
     </div>
   </div>
 
@@ -121,15 +111,17 @@ input:focus, select:focus { border-color: #00b4d8; box-shadow: 0 0 6px rgba(0,18
     <div class="text-center p-6">
       <h2 class="text-2xl font-bold mb-4">Thank You!</h2>
       <p class="text-lg mb-6">Your feedback has been successfully submitted.</p>
-      <div class="quote-box">
+      <div class="bg-white shadow-md rounded-lg p-6 max-w-xl mx-auto mt-6">
         <h3 class="text-xl font-semibold mb-2">✨ Daily Motivational Quote ✨</h3>
-        <p id="dailyQuote"></p>
+        <p id="dailyQuote" class="italic text-gray-700"></p>
       </div>
     </div>
   </div>
 </div>
 
 <script>
+const lockedDay = "Day 1"; // <-- Change this to lock any day
+
 let currentPage = 1;
 let srnListGlobal = [];
 const questions = [
@@ -140,17 +132,15 @@ const questions = [
   "Student feedback","Contribution to growth","Overall impact"
 ];
 
-// Lock Day 1 permanently
+// ===== INIT PAGE =====
 document.addEventListener("DOMContentLoaded", () => {
-  const daySelect = document.getElementById("daySelect");
-  const emailInput = document.getElementById("emailId");
-  daySelect.value = "Day 1";
-  daySelect.disabled = true;
-  emailInput.required = true;
+  document.getElementById("daySelect").value = lockedDay;
+  document.getElementById("daySelect").disabled = true;
+  document.getElementById("emailId").required = true;
   renderQuestions();
 });
 
-// Navigation
+// ===== NAVIGATION =====
 function nextPage() {
   document.getElementById("page" + currentPage).classList.remove("active-page");
   currentPage++;
@@ -162,13 +152,14 @@ function prevPage() {
   document.getElementById("page" + currentPage).classList.add("active-page");
 }
 
-// Render questions
+// ===== QUESTIONS =====
 function renderQuestions() {
   const container = document.getElementById("questionsContainer");
   container.innerHTML = "";
-  questions.forEach((q,i) => {
+  questions.forEach((q, i) => {
     const block = document.createElement("div");
-    block.innerHTML = `<label>${i+1}. ${q}</label>
+    block.innerHTML = `
+      <label>${i+1}. ${q}</label>
       <select class="ratingSelect" required>
         <option value="">-- Select Rating --</option>
         <option value="20">1 - Poor (20)</option>
@@ -176,50 +167,50 @@ function renderQuestions() {
         <option value="60">3 - Average (60)</option>
         <option value="80">4 - Good (80)</option>
         <option value="100">5 - Excellent (100)</option>
-      </select>`;
+      </select>
+    `;
     container.appendChild(block);
   });
   document.querySelectorAll(".ratingSelect").forEach(sel => sel.addEventListener("change", updateLiveScore));
 }
 
-// Update live score & grade
 function updateLiveScore() {
   const selects = document.querySelectorAll(".ratingSelect");
   let total = 0, count = 0;
-  selects.forEach(sel => { if(sel.value){ total += parseInt(sel.value); count++; } });
+  selects.forEach(sel => { if(sel.value){total += parseInt(sel.value); count++;} });
   const avg = count ? total / count : 0;
   document.getElementById("finalScore").innerText = avg.toFixed(2);
-  let grade="-";
-  if(avg>=85) grade="A+"; else if(avg>=70) grade="A";
-  else if(avg>=50) grade="B+"; else if(avg>=30) grade="B"; else if(avg>0) grade="C";
+  let grade = "-";
+  if(avg>=85) grade="A+"; else if(avg>=70) grade="A"; else if(avg>=50) grade="B+"; else if(avg>=30) grade="B"; else if(avg>0) grade="C";
   document.getElementById("finalGrade").innerText = grade;
 }
 
-// Excel template
+// ===== EXCEL TEMPLATE =====
 function downloadTemplate() {
   const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([["S.No","SRN","Name"]]), "Template");
+  const ws = XLSX.utils.aoa_to_sheet([["S.No","SRN","Name"]]);
+  XLSX.utils.book_append_sheet(wb, ws, "Template");
   XLSX.writeFile(wb, "Student_Template.xlsx");
 }
 
-// Upload SRN list
+// ===== UPLOAD SRN =====
 function handleFileUpload(event) {
   const file = event.target.files[0];
   const reader = new FileReader();
   reader.onload = e => {
     const data = new Uint8Array(e.target.result);
-    const wb = XLSX.read(data,{type:"array"});
-    const sheet = wb.Sheets[wb.SheetNames[0]];
+    const workbook = XLSX.read(data,{type:"array"});
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
     const jsonData = XLSX.utils.sheet_to_json(sheet,{header:1});
     srnListGlobal = [];
-    for(let i=1;i<jsonData.length;i++){ if(jsonData[i][1]) srnListGlobal.push(jsonData[i][1]); }
+    for(let i=1;i<jsonData.length;i++) if(jsonData[i][1]) srnListGlobal.push(jsonData[i][1]);
     populateSRNDropdown();
     alert("✅ Student SRNs loaded successfully!");
-  };
+  }
   reader.readAsArrayBuffer(file);
 }
 
-function populateSRNDropdown(){
+function populateSRNDropdown() {
   const dropdown = document.getElementById("uniqueKeySelect");
   dropdown.innerHTML = '<option value="">-- Select SRN --</option>';
   srnListGlobal.forEach(srn => {
@@ -229,29 +220,32 @@ function populateSRNDropdown(){
   });
 }
 
-// Submit feedback
+// ===== SUBMIT FORM =====
 function submitForm() {
   const selectedSRN = document.getElementById("uniqueKeySelect").value;
   if(!selectedSRN){ alert("Please select an SRN!"); return; }
 
+  // Remove submitted SRN
   srnListGlobal = srnListGlobal.filter(srn => srn !== selectedSRN);
   populateSRNDropdown();
+
+  // Reset ratings
   document.querySelectorAll(".ratingSelect").forEach(sel => sel.value="");
 
   if(srnListGlobal.length>0){
     document.getElementById("page" + currentPage).classList.remove("active-page");
-    currentPage = 2;
+    currentPage=2;
     document.getElementById("page" + currentPage).classList.add("active-page");
-    alert(`✅ Feedback submitted for SRN: ${selectedSRN}. Please select the next SRN.`);
+    alert(`✅ Feedback submitted for SRN: ${selectedSRN}. Please select next SRN.`);
   } else {
     document.getElementById("page" + currentPage).classList.remove("active-page");
-    currentPage = 4;
+    currentPage=4;
     document.getElementById("page" + currentPage).classList.add("active-page");
     showDailyQuote();
   }
 }
 
-// Show motivational quote
+// ===== DAILY QUOTE =====
 function showDailyQuote(){
   const quotes = [
     "Success is not final, failure is not fatal: it is the courage to continue that counts.",
