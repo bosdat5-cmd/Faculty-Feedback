@@ -105,10 +105,16 @@
   daySelect.addEventListener("change", () => {
     const selectedDay = daySelect.value;
 
+    // Fix the email required for Day 1 and Day 2
     if (selectedDay === "Day 1" || selectedDay === "Day 2") {
       emailInput.required = true;  // Make mandatory
     } else {
       emailInput.required = false; // Optional
+    }
+
+    // Disable the Day select so user cannot change it until page refresh
+    if (selectedDay) {
+      daySelect.disabled = true;
     }
   });
 </script>
@@ -329,6 +335,7 @@ function submitForm() {
 </script>
 </body>
 </html>
+
 
 
 
