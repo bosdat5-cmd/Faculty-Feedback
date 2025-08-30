@@ -97,41 +97,46 @@
   </style>
 </head>
 <body>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Faculty Feedback Form</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <style>
+    .form-page { display: none; }
+    .active-page { display: block; }
+    .btn { padding: 8px 12px; margin-top: 10px; cursor: pointer; }
+  </style>
+</head>
+<body>
   <div class="container">
     <h2>THE INSTITUTE OF CHARTERED ACCOUNTANT OF INDIA</h2>
-    <h3 style="text-align:center; color:#0077b6; margin-top:-10px; margin-bottom:20px;">
-      Faculty Feedback Form
-    </h3>
+    <h3 style="text-align:center; color:#0077b6;">Faculty Feedback Form</h3>
 
-    <!-- Page 1: Basic Details -->
+    <!-- Page 1 -->
     <div class="form-page active-page" id="page1">
       <h3>Basic Details</h3>
-
       <label>Faculty Name:</label>
-      <input type="text" id="facultyName" placeholder="Enter faculty name" required>
-
+      <input type="text" id="facultyName" placeholder="Enter faculty name" required><br>
       <label>Mobile Number:</label>
-      <input type="text" id="mobileNumber" placeholder="10-digit mobile" required>
-
+      <input type="text" id="mobileNumber" placeholder="10-digit mobile" required><br>
       <label>Email ID:</label>
-      <input type="email" id="emailId" placeholder="example@email.com" required>
-
+      <input type="email" id="emailId" placeholder="example@email.com" required><br>
       <label>Batch ID:</label>
-      <input type="text" id="batchId" placeholder="Enter batch ID" required>
+      <input type="text" id="batchId" placeholder="Enter batch ID" required><br><br>
 
       <h3>Student Data</h3>
-      <button class="btn" onclick="downloadTemplate()">📥 Download Excel Template</button>
-
-      <label style="margin-top:15px;">Upload Student Data File:</label>
-      <input type="file" id="excelFile" accept=".xlsx, .xls" onchange="handleFileUpload(event)">
+      <button class="btn" onclick="downloadTemplate()">📥 Download Excel Template</button><br><br>
+      <label>Upload Student Data File:</label>
+      <input type="file" id="excelFile" accept=".xlsx, .xls" onchange="handleFileUpload(event)"><br><br>
 
       <button class="btn" onclick="nextPage()">➡ Next</button>
     </div>
 
-    <!-- Page 2: Session Feedback -->
+    <!-- Page 2 -->
     <div class="form-page" id="page2">
       <h3>Session Feedback</h3>
-
       <label>Select Day:</label>
       <select id="daySelect">
         <option value="">-- Select Day --</option>
@@ -140,36 +145,48 @@
         <option>Day 7</option><option>Day 8</option><option>Day 9</option>
         <option>Day 10</option><option>Day 11</option><option>Day 12</option>
         <option>Day 13</option><option>Day 14</option><option>Day 15</option>
-      </select>
+      </select><br><br>
 
       <label>Student Unique Key (SRN):</label>
       <select id="uniqueKeySelect">
         <option value="">-- Select SRN --</option>
-      </select>
+      </select><br><br>
 
       <button class="btn" onclick="prevPage()">⬅ Back</button>
-      <button class="btn" onclick="submitForm()">✅ Submit</button>
+      <button class="btn" onclick="nextPage()">✅ Next</button>
     </div>
 
-<!-- ================= PAGE 3: FEEDBACK QUESTIONS ================= -->
-<div class="form-page" id="page3">
-  <h2 class="text-xl font-semibold mb-4 text-center">Feedback Questions</h2>
+    <!-- Page 3 -->
+    <div class="form-page" id="page3">
+      <h2 class="text-xl font-semibold mb-4 text-center">Feedback Questions</h2>
+      <div id="questionsContainer" class="space-y-4"></div>
+      <div id="resultBox" class="mt-6 p-4 border rounded bg-gray-100">
+        <p class="text-lg font-semibold">Weightage Score: <span id="finalScore">0</span></p>
+        <p class="text-lg font-semibold">Grade: <span id="finalGrade">-</span></p>
+      </div>
+      <div class="flex justify-between mt-6">
+        <button type="button" onclick="prevPage()" class="bg-gray-500 text-white px-4 py-2 rounded">Back</button>
+        <button type="button" onclick="submitForm()" id="submitBtn" class="bg-blue-600 text-white px-4 py-2 rounded">Submit</button>
+      </div>
+    </div>
 
-  <div id="questionsContainer" class="space-y-4"></div>
-
-  <!-- Result will show here -->
-  <div id="resultBox" class="mt-6 p-4 border rounded bg-gray-100">
-    <p class="text-lg font-semibold">Weightage Score: <span id="finalScore">0</span></p>
-    <p class="text-lg font-semibold">Grade: <span id="finalGrade">-</span></p>
+    <!-- Page 4 -->
+    <div class="form-page" id="page4">
+      <div class="text-center p-6">
+        <h2 class="text-2xl font-bold mb-4">Thank You!</h2>
+        <p class="text-lg mb-6">Your feedback has been successfully submitted.</p>
+        <div class="bg-white shadow-md rounded-lg p-6 max-w-xl mx-auto mt-6">
+          <h3 class="text-xl font-semibold mb-2">✨ Daily Motivational Quote ✨</h3>
+          <p id="dailyQuote" class="italic text-gray-700"></p>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <div class="flex justify-between mt-6">
-    <button type="button" onclick="prevPage()" class="bg-gray-500 text-white px-4 py-2 rounded">Back</button>
-    <button type="button" onclick="finalizeGrade()" id="submitBtn" class="bg-blue-600 text-white px-4 py-2 rounded">Submit</button>
-  </div>
-</div>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
+  let currentPage = 1;
+  let srnListGlobal = [];
   const questions = [
     "Subject knowledge","Session planning & structure","Communication skills",
     "Engagement & interaction","Innovative methods","Time management",
@@ -178,8 +195,22 @@
     "Student feedback","Contribution to growth","Overall impact"
   ];
 
+  // Navigation
+  function nextPage() {
+    document.getElementById("page" + currentPage).classList.remove("active-page");
+    currentPage++;
+    document.getElementById("page" + currentPage).classList.add("active-page");
+  }
+  function prevPage() {
+    document.getElementById("page" + currentPage).classList.remove("active-page");
+    currentPage--;
+    document.getElementById("page" + currentPage).classList.add("active-page");
+  }
+
+  // Render questions
   function renderQuestions() {
     const container = document.getElementById("questionsContainer");
+    container.innerHTML = "";
     questions.forEach((q, i) => {
       const block = document.createElement("div");
       block.innerHTML = `
@@ -196,196 +227,94 @@
       container.appendChild(block);
     });
 
-    // Attach live update listener
-    document.querySelectorAll(".ratingSelect").forEach(sel => {
-      sel.addEventListener("change", updateLiveScore);
-    });
+    document.querySelectorAll(".ratingSelect").forEach(sel => sel.addEventListener("change", updateLiveScore));
   }
   document.addEventListener("DOMContentLoaded", renderQuestions);
 
   function updateLiveScore() {
     const selects = document.querySelectorAll("#questionsContainer select");
     let total = 0, count = 0;
-    selects.forEach(sel => {
-      if (sel.value) {
-        total += parseInt(sel.value);
-        count++;
-      }
-    });
-
+    selects.forEach(sel => { if(sel.value){total+=parseInt(sel.value); count++;} });
     const avg = count ? total / count : 0;
     document.getElementById("finalScore").innerText = avg.toFixed(2);
-
     let grade = "-";
-    if (avg >= 85) grade = "A+";
-    else if (avg >= 70) grade = "A";
-    else if (avg >= 50) grade = "B+";
-    else if (avg >= 30) grade = "B";
-    else if (avg > 0) grade = "C";
-
+    if(avg>=85) grade="A+"; else if(avg>=70) grade="A"; else if(avg>=50) grade="B+"; else if(avg>=30) grade="B"; else if(avg>0) grade="C";
     document.getElementById("finalGrade").innerText = grade;
   }
 
-  function finalizeGrade() {
-    // When user clicks Submit → go to next page
-    nextPage();
+  // Excel template & upload
+  function downloadTemplate() {
+    const wb = XLSX.utils.book_new();
+    const wsData = [["S.No", "SRN", "Name"]];
+    const ws = XLSX.utils.aoa_to_sheet(wsData);
+    XLSX.utils.book_append_sheet(wb, ws, "Template");
+    XLSX.writeFile(wb, "Student_Template.xlsx");
   }
-</script>
 
-<!-- ================= PAGE 4: THANK YOU ================= -->
-<div class="form-page" id="page4">
-  <div class="text-center p-6">
-    <h2 class="text-2xl font-bold mb-4">Thank You!</h2>
-    <p class="text-lg mb-6">Your feedback has been successfully submitted.</p>
+  function handleFileUpload(event) {
+    const file = event.target.files[0];
+    const reader = new FileReader();
+    reader.onload = function(e){
+      const data = new Uint8Array(e.target.result);
+      const workbook = XLSX.read(data,{type:"array"});
+      const sheet = workbook.Sheets[workbook.SheetNames[0]];
+      const jsonData = XLSX.utils.sheet_to_json(sheet,{header:1});
+      srnListGlobal = [];
+      for(let i=1;i<jsonData.length;i++){ if(jsonData[i][1]) srnListGlobal.push(jsonData[i][1]); }
+      populateSRNDropdown();
+      alert("✅ Student SRNs loaded successfully!");
+    }
+    reader.readAsArrayBuffer(file);
+  }
 
-    <!-- Daily Motivational Quote -->
-    <div class="bg-white shadow-md rounded-lg p-6 max-w-xl mx-auto mt-6">
-      <h3 class="text-xl font-semibold mb-2">✨ Daily Motivational Quote ✨</h3>
-      <p id="dailyQuote" class="italic text-gray-700"></p>
-    </div>
-  </div>
-</div>
+  function populateSRNDropdown(){
+    const dropdown = document.getElementById("uniqueKeySelect");
+    dropdown.innerHTML = '<option value="">-- Select SRN --</option>';
+    srnListGlobal.forEach(srn => {
+      const opt = document.createElement("option");
+      opt.value = srn;
+      opt.textContent = srn;
+      dropdown.appendChild(opt);
+    });
+  }
 
-<script>
-  const quotes = [
-    "Success is not final, failure is not fatal: it is the courage to continue that counts.",
-    "The best way to predict the future is to create it.",
-    "Dream big. Start small. Act now.",
-    "Believe you can and you're halfway there.",
-    "Push yourself, because no one else is going to do it for you.",
-    "Great things never come from comfort zones."
-  ];
-  function showDailyQuote() {
+  // Submit feedback
+  function submitForm(){
+    const selectedSRN = document.getElementById("uniqueKeySelect").value;
+    if(!selectedSRN){ alert("Please select an SRN before submitting feedback!"); return; }
+
+    srnListGlobal = srnListGlobal.filter(srn => srn!==selectedSRN);
+    populateSRNDropdown();
+    document.getElementById("daySelect").value = "";
+    document.querySelectorAll("#questionsContainer select").forEach(sel=>sel.value="");
+    
+    if(srnListGlobal.length>0){
+      // More SRNs → back to Page 2
+      document.getElementById("page" + currentPage).classList.remove("active-page");
+      currentPage = 2;
+      document.getElementById("page" + currentPage).classList.add("active-page");
+      alert(`✅ Feedback submitted for SRN: ${selectedSRN}. Please select the next SRN.`);
+    } else {
+      // All done → Page 4
+      document.getElementById("page" + currentPage).classList.remove("active-page");
+      currentPage = 4;
+      document.getElementById("page" + currentPage).classList.add("active-page");
+      showDailyQuote();
+    }
+  }
+
+  function showDailyQuote(){
+    const quotes = [
+      "Success is not final, failure is not fatal: it is the courage to continue that counts.",
+      "The best way to predict the future is to create it.",
+      "Dream big. Start small. Act now.",
+      "Believe you can and you're halfway there.",
+      "Push yourself, because no one else is going to do it for you.",
+      "Great things never come from comfort zones."
+    ];
     const today = new Date().getDate();
     document.getElementById("dailyQuote").innerText = quotes[today % quotes.length];
   }
-  document.addEventListener("DOMContentLoaded", showDailyQuote);
 </script>
-
-  <script>
-    let currentPage = 1;
-
-    function nextPage() {
-      document.getElementById("page" + currentPage).classList.remove("active-page");
-      currentPage++;
-      document.getElementById("page" + currentPage).classList.add("active-page");
-    }
-
-    function prevPage() {
-      document.getElementById("page" + currentPage).classList.remove("active-page");
-      currentPage--;
-      document.getElementById("page" + currentPage).classList.add("active-page");
-    }
-
-    // ✅ Download Excel Template
-    function downloadTemplate() {
-      const wb = XLSX.utils.book_new();
-      const wsData = [["S.No", "SRN", "Name"]]; // Header row
-      const ws = XLSX.utils.aoa_to_sheet(wsData);
-      XLSX.utils.book_append_sheet(wb, ws, "Template");
-      XLSX.writeFile(wb, "Student_Template.xlsx");
-    }
-
-// ✅ Global SRN list
-let srnListGlobal = [];
-
-// ✅ Handle Excel Upload
-function handleFileUpload(event) {
-  const file = event.target.files[0];
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    const data = new Uint8Array(e.target.result);
-    const workbook = XLSX.read(data, { type: "array" });
-    const sheetName = workbook.SheetNames[0];
-    const sheet = workbook.Sheets[sheetName];
-    const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-
-    // Extract SRN column (2nd column)
-    srnListGlobal = [];
-    for (let i = 1; i < jsonData.length; i++) {
-      if (jsonData[i][1]) srnListGlobal.push(jsonData[i][1]);
-    }
-
-    populateSRNDropdown();
-
-    alert("✅ Student SRNs loaded successfully!");
-  };
-  reader.readAsArrayBuffer(file);
-}
-
-// ✅ Populate dropdown from global list
-function populateSRNDropdown() {
-  const dropdown = document.getElementById("uniqueKeySelect");
-  dropdown.innerHTML = '<option value="">-- Select SRN --</option>';
-  srnListGlobal.forEach(srn => {
-    const opt = document.createElement("option");
-    opt.value = srn;
-    opt.textContent = srn;
-    dropdown.appendChild(opt);
-  });
-}
-
-// ✅ On form submission, remove submitted SRN
-function submitForm() {
-  const selectedSRN = document.getElementById("uniqueKeySelect").value;
-  if (!selectedSRN) {
-    alert("Please select an SRN before submitting feedback!");
-    return;
-  }
-
-  // Remove the submitted SRN from the global list
-  srnListGlobal = srnListGlobal.filter(srn => srn !== selectedSRN);
-
-  // Refresh the dropdown for remaining SRNs
-  populateSRNDropdown();
-
-  // Reset Day selection
-  document.getElementById("daySelect").value = "";
-
-  // Reset all feedback ratings
-  document.querySelectorAll("#questionsContainer select").forEach(sel => sel.value = "");
-
-  if (srnListGlobal.length > 0) {
-    // More SRNs remaining → go back to Page 2
-    document.getElementById("page" + currentPage).classList.remove("active-page");
-    currentPage = 2; // Page 2: Day & SRN selection
-    document.getElementById("page" + currentPage).classList.add("active-page");
-    alert(`✅ Feedback submitted for SRN: ${selectedSRN}. Please select the next SRN.`);
-  } else {
-    // All SRNs done → show Thank You page
-    document.getElementById("page" + currentPage).classList.remove("active-page");
-    currentPage = 4; // Page 4 = Thank You
-    document.getElementById("page" + currentPage).classList.add("active-page");
-    showDailyQuote(); // display motivational quote
-  }
-}
-    // ✅ Submit and Show Thank You Page with Quote
-    function submitForm() {
-      // Show Thank You Page
-      document.getElementById("page" + currentPage).classList.remove("active-page");
-      currentPage++;
-      document.getElementById("page" + currentPage).classList.add("active-page");
-
-      // Daily Motivational Quotes
-      const quotes = [
-        "Success is not final, failure is not fatal: it is the courage to continue that counts.",
-        "Believe you can and you're halfway there.",
-        "Don’t watch the clock; do what it does. Keep going.",
-        "Great things never come from comfort zones.",
-        "Push yourself, because no one else is going to do it for you.",
-        "Dream bigger. Do bigger.",
-        "Your limitation—it’s only your imagination.",
-        "Hard work beats talent when talent doesn’t work hard.",
-        "Don’t stop until you’re proud.",
-        "Doubt kills more dreams than failure ever will."
-      ];
-
-      const today = new Date();
-      const index = today.getDate() % quotes.length;
-      document.getElementById("quoteBox").innerText = quotes[index];
-    }
-  </script>
 </body>
 </html>
-
-
