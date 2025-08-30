@@ -98,50 +98,19 @@
 </head>
 <body>
 <script>
-const emailInput = document.getElementById("emailId");
 const daySelect = document.getElementById("daySelect");
+const emailInput = document.getElementById("emailId");
 
-let selectedDayValue = null; // stores the Day permanently
+let selectedDayValue = null; // permanently stores the selected Day
 
 daySelect.addEventListener("change", () => {
-  if (!selectedDayValue) {
-    selectedDayValue = daySelect.value; // save selected day
-    daySelect.disabled = true;          // lock the Day immediately
-    // Make email required only for Day 1 and Day 2
+  if (!selectedDayValue && daySelect.value) {
+    selectedDayValue = daySelect.value;   // store selected day
+    daySelect.disabled = true;            // lock dropdown immediately
+    // Make email required only for Day 1 or Day 2
     emailInput.required = selectedDayValue === "Day 1" || selectedDayValue === "Day 2";
   }
 });
-  // Modify submitForm to retain locked Day for all SRNs
-function submitForm() {
-    const selectedSRN = document.getElementById("uniqueKeySelect").value;
-    if (!selectedSRN) {
-        alert("Please select an SRN before submitting feedback!");
-        return;
-    }
-
-    // Remove submitted SRN from global list
-    srnListGlobal = srnListGlobal.filter(srn => srn !== selectedSRN);
-
-    // Reset SRN dropdown only (keep Day locked!)
-    populateSRNDropdown();
-
-    // Reset all feedback ratings
-    document.querySelectorAll("#questionsContainer select").forEach(sel => sel.value = "");
-
-    if (srnListGlobal.length > 0) {
-        // More SRNs remaining → go back to Page 2 (SRN selection only)
-        document.getElementById("page" + currentPage).classList.remove("active-page");
-        currentPage = 2; // Page 2 = SRN & Day selection (Day stays locked)
-        document.getElementById("page" + currentPage).classList.add("active-page");
-        alert(`✅ Feedback submitted for SRN: ${selectedSRN}. Please select the next SRN.`);
-    } else {
-        // All SRNs done → show Thank You page
-        document.getElementById("page" + currentPage).classList.remove("active-page");
-        currentPage = 4; // Page 4 = Thank You
-        document.getElementById("page" + currentPage).classList.add("active-page");
-        showDailyQuote();
-    }
-}
 </script>
 
   <div class="container">
@@ -359,6 +328,7 @@ function submitForm() {
 </script>
 </body>
 </html>
+
 
 
 
