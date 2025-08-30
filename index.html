@@ -235,8 +235,11 @@ function submitForm() {
   const selectedSRN = document.getElementById("uniqueKeySelect").value;
   if(!selectedSRN){ alert("Select SRN"); return; }
 
-  // Mark SRN as completed
-  srnListGlobal = srnListGlobal.map(srn => srn.value === selectedSRN ? { ...srn, completed:true } : srn );
+// When loading SRNs from Excel
+srnListGlobal.push({ value: jsonData[i][1].toString().trim(), completed: false });
+
+// When marking completed
+srnListGlobal = srnListGlobal.map(srn => srn.value.trim() === selectedSRN.trim() ? { ...srn, completed:true } : srn );
   populateSRNDropdown();
 
   document.querySelectorAll(".ratingSelect").forEach(sel=>sel.value="");
@@ -280,4 +283,5 @@ document.addEventListener("DOMContentLoaded", () => {
 </script>
 </body>
 </html>
+
 
