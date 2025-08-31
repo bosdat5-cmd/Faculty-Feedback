@@ -293,14 +293,22 @@ async function submitFeedback(){
   };
 
   try {
-    const response = await fetch(webAppURL, {
+    const resp = await fetch(webAppURL, {
       method: "POST",
       headers: {"Content-Type":"application/json"},
       body: JSON.stringify(payload)
     });
-    const result = await response.json();
 
-    if(result.status === "success"){
+    const text = await resp.text();  // read as text first
+    let result;
+    try {
+      result = JSON.parse(text);     // then try to parse
+    } catch (e) {
+      // Show the first part of the HTML so you know what's wrong
+      throw new Error("Backend did not return JSON. First 200 chars:\n" + text.slice(0, 200));
+    }
+
+    if (result.status === "success"){
       srnObj.completed = true;
       const remaining = srnListGlobal.filter(s => !s.completed);
       if(remaining.length > 0){
@@ -315,13 +323,12 @@ async function submitFeedback(){
         showDailyQuote();
       }
     } else {
-      alert("Error: " + result.message);
+      alert("Error: " + (result.message || "Unknown error"));
     }
   } catch(err){
     alert("Submission failed: " + err.message);
   }
 }
-
 // --- Previous SRN ---
 function prevPage3(){
   const prevIndex=srnListGlobal.slice(0,currentSRNIndex).reverse().findIndex(s=>s.completed);
@@ -360,4 +367,5 @@ document.addEventListener("DOMContentLoaded", () => {
 </script>
 </body>
 </html>
+
 
