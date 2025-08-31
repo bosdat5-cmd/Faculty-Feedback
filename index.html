@@ -107,7 +107,7 @@ input:focus, select:focus { border-color:#00b4d8; box-shadow:0 0 6px rgba(0,180,
 </div>
 
 <script>
-const webAppURL = "YOUR_DEPLOYED_APP_SCRIPT_URL_HERE"; // 🔹 Replace with your Apps Script Web App URL
+const webAppURL = "YOUR_DEPLOYED_APP_SCRIPT_URL_HERE"; // 🔹 replace with your deployed web app URL
 
 let currentPage = 1;
 let srnListGlobal = [];
@@ -177,6 +177,7 @@ function renderQuestions(){
   document.querySelectorAll(".ratingSelect").forEach(sel=>sel.addEventListener("change",updateLiveScore));
 }
 
+// --- Live Score & Grade ---
 function updateLiveScore(){
   const selects=document.querySelectorAll(".ratingSelect");
   let total=0,count=0;
@@ -188,7 +189,7 @@ function updateLiveScore(){
   document.getElementById("finalGrade").innerText=grade;
 }
 
-// --- Excel Template ---
+// --- Download Excel Template ---
 function downloadTemplate(){
   const wb=XLSX.utils.book_new();
   const ws=XLSX.utils.aoa_to_sheet([["S.No","SRN","Name"]]);
@@ -196,7 +197,7 @@ function downloadTemplate(){
   XLSX.writeFile(wb,"Student_Template.xlsx");
 }
 
-// --- Handle file upload ---
+// --- Handle Excel Upload ---
 function handleFileUpload(event){
   const file=event.target.files[0];
   const reader=new FileReader();
@@ -220,7 +221,7 @@ function handleFileUpload(event){
 function lockDayForPages(selectedDay){
   lockedDay = selectedDay;
   document.getElementById("lockDaySelect").value = lockedDay;
-  document.getElementById("lockDaySelect").disabled = true; // lock
+  document.getElementById("lockDaySelect").disabled = true;
   document.getElementById("daySelect").innerHTML = `<option value="${lockedDay}">Day ${lockedDay}</option>`;
   document.getElementById("daySelect").disabled = true;
 }
@@ -267,9 +268,10 @@ function loadSRN(index){
   }
 }
 
-// --- Submit Feedback ---
+// --- Submit Feedback (Fully Working) ---
 async function submitFeedback(){
-  if(!srnListGlobal[currentSRNIndex]) return;
+  const srnObj = srnListGlobal[currentSRNIndex];
+  if(!srnObj) return;
 
   const selects = document.querySelectorAll(".ratingSelect");
   for(let sel of selects){
@@ -277,36 +279,37 @@ async function submitFeedback(){
   }
 
   const payload = {
-    facultyName: document.getElementById("facultyName").value,
-    mobile: document.getElementById("mobileNumber").value,
-    email: document.getElementById("emailId").value,
-    batchId: document.getElementById("batchId").value,
+    facultyName: document.getElementById("facultyName").value.trim(),
+    mobile: document.getElementById("mobileNumber").value.trim(),
+    email: document.getElementById("emailId").value.trim(),
+    batchId: document.getElementById("batchId").value.trim(),
     region: document.getElementById("regionSelect").value,
     branch: document.getElementById("branchSelect").value,
     day: lockedDay,
-    srn: srnListGlobal[currentSRNIndex].value,
+    srn: srnObj.value,
     ratings: Array.from(selects).map(s => s.value),
     score: document.getElementById("finalScore").innerText,
     grade: document.getElementById("finalGrade").innerText
   };
 
   try {
-const response = await fetch("https://script.google.com/macros/s/AKfycbzoHUoC1r7q3C1t5AMkMLkdQzL0GZQEJ5xflcxbNrTcvpDSQPyIj36jLyAZEoMBltbysQ/exec", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify(payload)
-});
-
+    const response = await fetch(webAppURL, {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify(payload)
+    });
     const result = await response.json();
 
-    if(result.status === "success") {
-      srnListGlobal[currentSRNIndex].completed = true;
+    if(result.status === "success"){
+      srnObj.completed = true;
       const remaining = srnListGlobal.filter(s => !s.completed);
       if(remaining.length > 0){
-        currentSRNIndex = srnListGlobal.findIndex(s => !s.completed);
-        loadSRN(currentSRNIndex);
         updateSRNsForPage2();
+        const nextIndex = srnListGlobal.findIndex(s => !s.completed);
+        currentSRNIndex = nextIndex;
+        loadSRN(currentSRNIndex);
         alert("✅ Feedback submitted! Next SRN loaded.");
+        showPage(2);
       } else {
         showPage(4);
         showDailyQuote();
@@ -314,12 +317,10 @@ const response = await fetch("https://script.google.com/macros/s/AKfycbzoHUoC1r7
     } else {
       alert("Error: " + result.message);
     }
-
   } catch(err){
     alert("Submission failed: " + err.message);
   }
 }
-
 
 // --- Previous SRN ---
 function prevPage3(){
@@ -354,8 +355,9 @@ function showDailyQuote(){
 document.addEventListener("DOMContentLoaded", () => {
   renderQuestions();
   populateDayDropdown();
-  updateBranches(); // ensures branches dropdown populates if region is selected
+  updateBranches();
 });
 </script>
 </body>
 </html>
+
