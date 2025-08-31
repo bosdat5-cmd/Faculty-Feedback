@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -128,6 +129,7 @@
         <option value="SIRC">SIRC</option>
         <option value="EIRC">EIRC</option>
         <option value="NIRC">NIRC</option>
+	<option value="FIRC">FIRC</option>	
       </select>
 
       <label>Select Branch:</label>
@@ -148,15 +150,26 @@
     <div class="form-page" id="page2">
       <h3>Session Feedback</h3>
 
-      <label>Select Day:</label>
-      <select id="daySelect">
-        <option value="">-- Select Day --</option>
-        <option>Day 1</option><option>Day 2</option><option>Day 3</option>
-        <option>Day 4</option><option>Day 5</option><option>Day 6</option>
-        <option>Day 7</option><option>Day 8</option><option>Day 9</option>
-        <option>Day 10</option><option>Day 11</option><option>Day 12</option>
-        <option>Day 13</option><option>Day 14</option><option>Day 15</option>
-      </select>
+<label for="daySelect">Select Day:</label>
+<select id="daySelect" onchange="lockDay()">
+  <option value="">-- Select Day --</option>
+  <option value="Day 1">Day 1</option>
+  <option value="Day 2">Day 2</option>
+  <option value="Day 3">Day 3</option>
+  <option value="Day 4">Day 4</option>
+  <option value="Day 5">Day 5</option>
+  <!-- add till Day 15 -->
+</select>
+
+<script>
+function lockDay() {
+  const daySelect = document.getElementById("daySelect");
+  if (daySelect.value) {
+    // 🔒 Lock the dropdown so user cannot change again
+    daySelect.disabled = true;
+  }
+}
+</script>
 
       <label>Student Unique Key (SRN):</label>
       <select id="uniqueKeySelect">
@@ -201,7 +214,8 @@
     "WIRC": ["Ahmedabad","Ahmednagar","Akola","Amravati","Anand","Bharuch","Bhavnagar","Bhuj","Dhule","Gandhidham","Gandhinagar","Goa","Ichalkaranji","Jalgaon","Jamnagar","Kolhapur","Kalyan Dombivli","Latur","Nagpur","Nanded","Nashik","Navi Mumbai","Navsari","Pimpri Chinchwad","Pune","Rajkot","Ratnagiri","Sangli","Satara","Solapur","Surat","Thane","Vadodara","Vapi","Vasai"],
     "SIRC": ["Alappuzha","Anantapur","Ballari","Belagavi","Bengaluru","Chengalpattu","Chhatrapati Sambhajinagar (Aurangabad)","Coimbatore","Ernakulam","Erode","Guntur","Hubballi","Hyderabad","Kadapa","Kakinada","Kalaburagi","Kannur","Karimnagar","Karnal","Kollam","Kottayam","Kozhikode","Kumbakonam","Kurnool","Madurai","Mangaluru","Mysuru","Nellore","Ongole","Palakkad","Puducherry","Rajamahendravaram","Salem","Sivakasi","Thiruvananthapuram","Thoothukudi","Thrissur","Tiruchirapalli","Tirunelveli","Tirupati","Tirupur","Udupi","Vellore","Vijayawada","Visakhapatnam","Vizianagaram","Warangal","West Godavari"],
     "EIRC": ["Asansol","Bhubaneswar","Brahmapur","Cuttack","Dibrugarh","Durgapur","Guwahati","Jharsuguda","Raniganj","Rourkela","Sambalpur","Siliguri","Tinsukia"],
-    "NIRC": ["Ambala","Amritsar","Bahadurgarh","Bathinda","Chandigarh","Faridabad","Gurugram","Hisar","Jalandhar","Jammu And Kashmir","Kaithal","Karnal","Kurukshetra","Ludhiana","Mandi Gobindgarh","Panipat","Patiala","Rewari","Rohtak","Sirsa","Sonepat","Yamunanagar","Himachal Pradesh"]
+    "NIRC": ["Ambala","Amritsar","Bahadurgarh","Bathinda","Chandigarh","Faridabad","Gurugram","Hisar","Jalandhar","Jammu And Kashmir","Kaithal","Karnal","Kurukshetra","Ludhiana","Mandi Gobindgarh","Panipat","Patiala","Rewari","Rohtak","Sirsa","Sonepat","Yamunanagar","Himachal Pradesh"],
+    "FIRC": ["Dubai"]
   };
 
   function updateBranches() {
