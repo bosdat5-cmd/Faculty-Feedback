@@ -292,7 +292,7 @@ async function submitFeedback(){
   };
 
   try {
-    const resp = await fetch(webAppURL, {
+    const resp = await fetch("https://script.google.com/macros/s/AKfycbzoHUoC1r7q3C1t5AMkMLkdQzL0GZQEJ5xflcxbNrTcvpDSQPyIj36jLyAZEoMBltbysQ/exec", {
       method: "POST",
       headers: {"Content-Type":"application/json"},
       body: JSON.stringify(payload)
@@ -366,6 +366,7 @@ document.addEventListener("DOMContentLoaded", () => {
 </script>
 </body>
 </html>
+
 
 
 
