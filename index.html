@@ -51,7 +51,8 @@ input:focus, select:focus { border-color:#00b4d8; box-shadow:0 0 6px rgba(0,180,
     <label>Branches:</label>
     <select id="branchSelect" required>
       <option value="">-- Select Branch --</option>
-
+    </select>
+    
     <h3>Select Day for Feedback</h3>
     <label>Day:</label>
     <select id="lockDaySelect" required>
@@ -106,7 +107,7 @@ input:focus, select:focus { border-color:#00b4d8; box-shadow:0 0 6px rgba(0,180,
 </div>
 
 <script>
-const webAppURL = "YOUR_DEPLOYED_APP_SCRIPT_URL_HERE"; // 🔹 replace with your deployed web app URL
+const webAppURL = "https://script.google.com/macros/s/AKfycbzoHUoC1r7q3C1t5AMkMLkdQzL0GZQEJ5xflcxbNrTcvpDSQPyIj36jLyAZEoMBltbysQ/exec"; // 🔹 replace with your deployed web app URL
 
 let currentPage = 1;
 let srnListGlobal = [];
@@ -366,6 +367,7 @@ document.addEventListener("DOMContentLoaded", () => {
 </script>
 </body>
 </html>
+
 
 
 
