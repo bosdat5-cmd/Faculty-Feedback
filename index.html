@@ -343,7 +343,7 @@ function showPage(pageNum){
   document.getElementById("page"+pageNum).classList.add("active-page");
   currentPage=pageNum;
 }
-
+<script>
 // --- Daily Quote ---
 function showDailyQuote(){
   const quotes=[
@@ -364,9 +364,24 @@ document.addEventListener("DOMContentLoaded", () => {
   populateDayDropdown();
   updateBranches();
 });
+
+// --- Start Feedback ---
+function startFeedback() {
+  // Go from Page 1 to Page 2
+  document.getElementById("page1").classList.remove("active-page");
+  document.getElementById("page2").classList.add("active-page");
+
+  // Lock the selected day
+  const selectedDay = document.getElementById("lockDaySelect").value;
+  if (selectedDay) {
+    const daySelect = document.getElementById("daySelect");
+    daySelect.innerHTML = `<option value="${selectedDay}">${selectedDay}</option>`;
+  }
+}
 </script>
 </body>
 </html>
+
 
 
 
