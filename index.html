@@ -122,12 +122,12 @@ function updateBranches(){
   if(branches[region]){
     branches[region].forEach(b=>{
       const opt=document.createElement("option");
-      opt.value=opt.textContent=b;
+      opt.value=b;
+      opt.textContent=b;
       branchSelect.appendChild(opt);
     });
   }
 }
-
 function populateDayDropdown(){
   const daySel=document.getElementById("lockDaySelect");
   for(let i=1;i<=15;i++){
