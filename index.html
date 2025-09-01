@@ -370,8 +370,7 @@ window.addEventListener("DOMContentLoaded", () => {
     currentPage++;
     document.getElementById("page" + currentPage).classList.add("active-page");
   }
-// ✅ New SubmitFeedback Function
-// ✅ New SubmitFeedback Function
+// Submit Feedback Function
 function SubmitFeedback() {
   // Update score before final submit
   updateLiveScore();
@@ -379,22 +378,56 @@ function SubmitFeedback() {
   const finalScore = document.getElementById("finalScore").innerText;
   const finalGrade = document.getElementById("finalGrade").innerText;
 
-  // Debug log
-  console.log("Feedback Submitted:", { score: finalScore, grade: finalGrade });
+  // Get selected SRN
+  const srnDropdown = document.getElementById("srnDropdown");
+  const selectedSRN = srnDropdown.value;
 
-  // Move to Thank You page
+  if (!selectedSRN) {
+    alert("⚠️ Please select a student before submitting.");
+    return;
+  }
+
+  // Debug log
+  console.log("Feedback Submitted:", { SRN: selectedSRN, score: finalScore, grade: finalGrade });
+
+  // ✅ Alert after submit
+  alert(`✅ Student ${selectedSRN} form submitted successfully!`);
+
+  // ✅ Remove submitted SRN from dropdown
+  srnDropdown.querySelector(`option[value='${selectedSRN}']`).remove();
+
+  // ✅ Reset back to Page 2 for next student
   document.getElementById("page" + currentPage).classList.remove("active-page");
-  currentPage++;
+  currentPage = 2;
   document.getElementById("page" + currentPage).classList.add("active-page");
 
-  // Show results on Thank You page
-  const resultDiv = document.getElementById("submittedResult");
-  if (resultDiv) {
-    resultDiv.innerHTML = `<p class="mt-4 text-lg font-semibold text-green-700">
-      ✅ Your Score: ${finalScore} | Grade: ${finalGrade}
-    </p>`;
+  // ✅ Reset result box for next student
+  document.getElementById("finalScore").innerText = "0";
+  document.getElementById("finalGrade").innerText = "-";
+
+  // ✅ If no SRN left
+  if (srnDropdown.options.length === 1) { // only "Select SRN" left
+    alert("🎉 All students have submitted their feedback!");
+    currentPage = 4;
+    document.querySelectorAll(".form-page").forEach(p => p.classList.remove("active-page"));
+    document.getElementById("page4").classList.add("active-page");
   }
 }
+
+// ================== DAY LOCK / UNLOCK ==================
+document.addEventListener("DOMContentLoaded", () => {
+  const dayDropdown = document.getElementById("dayDropdown");
+
+  // By default → unlocked on refresh
+  dayDropdown.disabled = false;
+
+  // Lock once user selects a day
+  dayDropdown.addEventListener("change", () => {
+    if (dayDropdown.value) {
+      dayDropdown.disabled = true;
+    }
+  });
+});
   // Daily Quote
   const quotes = [
     "Success is not final, failure is not fatal: it is the courage to continue that counts.",
@@ -412,6 +445,7 @@ function SubmitFeedback() {
 </script>
 </body>
 </html>
+
 
 
 
