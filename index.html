@@ -200,32 +200,33 @@ window.addEventListener("DOMContentLoaded", () => {
       <button class="btn" onclick="submitForm()">✅ Submit</button>
     </div>
 
-    <!-- PAGE 3: Feedback Questions -->
-    <div class="form-page" id="page3">
-      <h2 class="text-xl font-semibold mb-4 text-center">Feedback Questions</h2>
-      <div id="questionsContainer" class="space-y-4"></div>
-      <div id="resultBox" class="mt-6 p-4 border rounded bg-gray-100">
-        <p class="text-lg font-semibold">Weightage Score: <span id="finalScore">0</span></p>
-        <p class="text-lg font-semibold">Grade: <span id="finalGrade">-</span></p>
-      </div>
-	<div class="flex justify-between mt-6">
-	  <button type="button" onclick="prevPage()" class="bg-gray-500 text-white px-4 py-2 rounded">Back</button>
-	  <button type="button" onclick="SubmitFeedback()" class="bg-blue-600 text-white px-4 py-2 rounded">Submit Feedback</button>
-	</div>
-    </div>
-
-    <!-- PAGE 4: Thank You -->
-    <div class="form-page" id="page4">
-      <div class="text-center p-6">
-        <h2 class="text-2xl font-bold mb-4">Thank You!</h2>
-        <p class="text-lg mb-6">Your feedback has been successfully submitted.</p>
-        <div class="bg-white shadow-md rounded-lg p-6 max-w-xl mx-auto mt-6">
-          <h3 class="text-xl font-semibold mb-2">✨ Daily Motivational Quote ✨</h3>
-          <p id="dailyQuote" class="italic text-gray-700"></p>
-        </div>
-      </div>
-    </div>
+<!-- PAGE 3: Feedback Questions -->
+<div class="form-page" id="page3">
+  <h2 class="text-xl font-semibold mb-4 text-center">Feedback Questions</h2>
+  <div id="questionsContainer" class="space-y-4"></div>
+  <div id="resultBox" class="mt-6 p-4 border rounded bg-gray-100">
+    <p class="text-lg font-semibold">Weightage Score: <span id="finalScore">0</span></p>
+    <p class="text-lg font-semibold">Grade: <span id="finalGrade">-</span></p>
   </div>
+  <div class="flex justify-between mt-6">
+    <button type="button" onclick="prevPage()" class="bg-gray-500 text-white px-4 py-2 rounded">Back</button>
+    <button type="button" onclick="SubmitFeedback()" class="bg-blue-600 text-white px-4 py-2 rounded">Submit Feedback</button>
+  </div>
+</div>
+
+<!-- PAGE 4: Thank You -->
+<div class="form-page" id="page4">
+  <div class="text-center p-6">
+    <h2 class="text-2xl font-bold mb-4">Thank You!</h2>
+    <p class="text-lg mb-6">Your feedback has been successfully submitted.</p>
+    <div class="bg-white shadow-md rounded-lg p-6 max-w-xl mx-auto mt-6">
+      <h3 class="text-xl font-semibold mb-2">✨ Daily Motivational Quote ✨</h3>
+      <p id="dailyQuote" class="italic text-gray-700"></p>
+    </div>
+    <!-- ✅ Show submitted results here -->
+    <div id="submittedResult" class="mt-6"></div>
+  </div>
+</div>
 
 <script>
   // ================= Regions & Branches =================
@@ -370,30 +371,30 @@ window.addEventListener("DOMContentLoaded", () => {
     document.getElementById("page" + currentPage).classList.add("active-page");
   }
 // ✅ New SubmitFeedback Function
-  function SubmitFeedback() {
-    // Update score before final submit
-    updateLiveScore();
+// ✅ New SubmitFeedback Function
+function SubmitFeedback() {
+  // Update score before final submit
+  updateLiveScore();
 
-    const finalScore = document.getElementById("finalScore").innerText;
-    const finalGrade = document.getElementById("finalGrade").innerText;
+  const finalScore = document.getElementById("finalScore").innerText;
+  const finalGrade = document.getElementById("finalGrade").innerText;
 
-    // Debug log
-    console.log("Feedback Submitted:", { score: finalScore, grade: finalGrade });
+  // Debug log
+  console.log("Feedback Submitted:", { score: finalScore, grade: finalGrade });
 
-    // Move to Thank You page
-    document.getElementById("page" + currentPage).classList.remove("active-page");
-    currentPage++;
-    document.getElementById("page" + currentPage).classList.add("active-page");
+  // Move to Thank You page
+  document.getElementById("page" + currentPage).classList.remove("active-page");
+  currentPage++;
+  document.getElementById("page" + currentPage).classList.add("active-page");
 
-    // Show results on Thank You page
-    const thankYouDiv = document.querySelector("#page4 .text-center");
-    if (thankYouDiv) {
-      const resultMsg = document.createElement("p");
-      resultMsg.className = "mt-4 text-lg font-semibold text-green-700";
-      resultMsg.innerText = `✅ Your Score: ${finalScore} | Grade: ${finalGrade}`;
-      thankYouDiv.appendChild(resultMsg);
-    }
+  // Show results on Thank You page
+  const resultDiv = document.getElementById("submittedResult");
+  if (resultDiv) {
+    resultDiv.innerHTML = `<p class="mt-4 text-lg font-semibold text-green-700">
+      ✅ Your Score: ${finalScore} | Grade: ${finalGrade}
+    </p>`;
   }
+}
   // Daily Quote
   const quotes = [
     "Success is not final, failure is not fatal: it is the courage to continue that counts.",
@@ -411,6 +412,7 @@ window.addEventListener("DOMContentLoaded", () => {
 </script>
 </body>
 </html>
+
 
 
 
