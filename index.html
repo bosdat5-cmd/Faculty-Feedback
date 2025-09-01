@@ -399,7 +399,7 @@ function SubmitFeedback() {
 
   // ✅ Check if SRN left
   if (srnDropdown.options.length > 1) {
-    // Still students left → back to Page 2
+    // Students left → back to Page 2
     document.getElementById("page" + currentPage).classList.remove("active-page");
     currentPage = 2;
     document.getElementById("page" + currentPage).classList.add("active-page");
@@ -420,14 +420,14 @@ function SubmitFeedback() {
   }
 }
 
-// ================== DAY LOCK / UNLOCK ==================
+// ✅ Day dropdown refresh hone par open rahe
 document.addEventListener("DOMContentLoaded", () => {
   const dayDropdown = document.getElementById("dayDropdown");
 
-  // By default → unlocked on refresh
+  // By default unlock
   dayDropdown.disabled = false;
 
-  // Lock once user selects a day
+  // Jab user ek day select kare → freeze
   dayDropdown.addEventListener("change", () => {
     if (dayDropdown.value) {
       dayDropdown.disabled = true;
@@ -451,6 +451,7 @@ document.addEventListener("DOMContentLoaded", () => {
 </script>
 </body>
 </html>
+
 
 
 
