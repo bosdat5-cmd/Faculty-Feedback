@@ -208,10 +208,10 @@ window.addEventListener("DOMContentLoaded", () => {
         <p class="text-lg font-semibold">Weightage Score: <span id="finalScore">0</span></p>
         <p class="text-lg font-semibold">Grade: <span id="finalGrade">-</span></p>
       </div>
-      <div class="flex justify-between mt-6">
-        <button type="button" onclick="prevPage()" class="bg-gray-500 text-white px-4 py-2 rounded">Back</button>
-        <button type="button" onclick="SubmitFeedback()" class="bg-blue-600 text-white px-4 py-2 rounded">Submit Feedback</button>
-	  </div>
+	<div class="flex justify-between mt-6">
+	  <button type="button" onclick="prevPage()" class="bg-gray-500 text-white px-4 py-2 rounded">Back</button>
+	  <button type="button" onclick="SubmitFeedback()" class="bg-blue-600 text-white px-4 py-2 rounded">Submit Feedback</button>
+	</div>
     </div>
 
     <!-- PAGE 4: Thank You -->
@@ -369,7 +369,31 @@ window.addEventListener("DOMContentLoaded", () => {
     currentPage++;
     document.getElementById("page" + currentPage).classList.add("active-page");
   }
+// ✅ New SubmitFeedback Function
+  function SubmitFeedback() {
+    // Update score before final submit
+    updateLiveScore();
 
+    const finalScore = document.getElementById("finalScore").innerText;
+    const finalGrade = document.getElementById("finalGrade").innerText;
+
+    // Debug log
+    console.log("Feedback Submitted:", { score: finalScore, grade: finalGrade });
+
+    // Move to Thank You page
+    document.getElementById("page" + currentPage).classList.remove("active-page");
+    currentPage++;
+    document.getElementById("page" + currentPage).classList.add("active-page");
+
+    // Show results on Thank You page
+    const thankYouDiv = document.querySelector("#page4 .text-center");
+    if (thankYouDiv) {
+      const resultMsg = document.createElement("p");
+      resultMsg.className = "mt-4 text-lg font-semibold text-green-700";
+      resultMsg.innerText = `✅ Your Score: ${finalScore} | Grade: ${finalGrade}`;
+      thankYouDiv.appendChild(resultMsg);
+    }
+  }
   // Daily Quote
   const quotes = [
     "Success is not final, failure is not fatal: it is the courage to continue that counts.",
@@ -387,5 +411,6 @@ window.addEventListener("DOMContentLoaded", () => {
 </script>
 </body>
 </html>
+
 
 
