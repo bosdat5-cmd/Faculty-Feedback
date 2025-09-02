@@ -96,362 +96,276 @@
     }
   </style>
 </head>
-<body>
-  <div class="container">
-    <h2>THE INSTITUTE OF CHARTERED ACCOUNTANT OF INDIA</h2>
-    <h3 style="text-align:center; color:#0077b6; margin-top:-10px; margin-bottom:20px;">
-      Faculty Feedback Form
-    </h3>
+<body class="bg-gray-100 text-gray-800">
 
-    <!-- Page 1: Basic Details -->
-    <div class="form-page active-page" id="page1">
-      <h3>Basic Details</h3>
+  <!-- Header -->
+  <div class="text-center py-6 bg-blue-900 text-white shadow-lg">
+    <h1 class="text-2xl font-bold uppercase">THE INSTITUTE OF CHARTERED ACCOUNTANTS OF INDIA</h1>
+    <p class="text-lg mt-1">Student Feedback Form</p>
+  </div>
 
-      <label>Faculty Name:</label>
-      <input type="text" id="facultyName" placeholder="Enter faculty name" required>
+  <div class="max-w-3xl mx-auto mt-6 bg-white p-8 rounded-2xl shadow-lg">
 
-      <label>Mobile Number:</label>
-      <input type="text" id="mobileNumber" placeholder="10-digit mobile" required>
+    <!-- Page 1: Basic Info -->
+    <div id="page1" class="form-page active-page card">
+      <h2 class="text-2xl font-semibold mb-4 text-blue-700">Basic Information</h2>
+      <p class="text-gray-500 mb-6">Please fill in your details to proceed with feedback.</p>
 
-      <label>Email ID:</label>
-      <input type="email" id="emailId" placeholder="example@email.com" required>
+      <label class="block mb-2 font-medium">Student Name <span class="text-red-500">*</span></label>
+      <input id="studentName" type="text" class="w-full p-3 border rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Your full name">
 
-      <label>Batch ID:</label>
-      <input type="text" id="batchId" placeholder="Enter batch ID" required>
+      <label class="block mb-2 font-medium">Registration Number <span class="text-red-500">*</span></label>
+      <input id="regNumber" type="text" class="w-full p-3 border rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="e.g. N/C/E/W/S/FRO1234567">
 
-      <!-- ✅ Region & Branch Dropdowns -->
-      <label>Select Region:</label>
-      <select id="regionSelect" onchange="updateBranches()" required>
-        <option value="">-- Select Region --</option>
-        <option value="CIRC">CIRC</option>
-        <option value="WIRC">WIRC</option>
-        <option value="SIRC">SIRC</option>
-        <option value="EIRC">EIRC</option>
-        <option value="NIRC">NIRC</option>
-	<option value="FIRC">FIRC</option>	
-      </select>
+      <label class="block mb-2 font-medium">Email <span class="text-red-500">*</span></label>
+      <input id="email" type="email" class="w-full p-3 border rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="example@email.com">
 
-      <label>Select Branch:</label>
-      <select id="branchSelect" required>
-        <option value="">-- Select Branch --</option>
-      </select>
+      <label class="block mb-2 font-medium">Mobile Number <span class="text-red-500">*</span></label>
+      <input id="mobile" type="tel" class="w-full p-3 border rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="10 digit number"> 
 
-      <h3>Student Data</h3>
-      <button class="btn" onclick="downloadTemplate()">📥 Download Excel Template</button>
+      <div class="flex justify-end mt-6">
+        <button type="button" class="btn-primary" onclick="validatePage1()">Next →</button>
+      </div>
+    </div>  
 
-      <label style="margin-top:15px;">Upload Student Data File:</label>
-      <input type="file" id="excelFile" accept=".xlsx, .xls" onchange="handleFileUpload(event)">
+    <!-- Page 2: Faculty Selection -->
+    <div id="page2" class="form-page card">
+      <h2 class="text-2xl font-semibold mb-4 text-blue-700">Select Faculty</h2>
+      <select id="facultySelect" class="w-full p-2 border rounded mb-6"></select>
 
-      <button class="btn" onclick="nextPage()">➡ Next</button>
+      <div class="flex justify-between mt-6">
+        <button type="button" class="btn-secondary" onclick="showPage(1)">← Back</button>
+        <button type="button" class="btn-primary" onclick="validatePage2()">Next →</button>
+      </div>
     </div>
 
-    <!-- Page 2: Session Feedback -->
-    <div class="form-page" id="page2">
-      <h3>Session Feedback</h3>
+    <!-- Page 3: Feedback -->
+    <div id="page3" class="form-page card">
+      <h2 class="text-2xl font-semibold mb-4 text-blue-700">Faculty Feedback</h2>
 
-<!-- ✅ Session Feedback Day Selection -->
-<label for="daySelect">Select Day:</label>
-<select id="daySelect" onchange="lockDay()">
-  <option value="">-- Select Day --</option>
-  <option value="Day 1">Day 1</option>
-  <option value="Day 2">Day 2</option>
-  <option value="Day 3">Day 3</option>
-  <option value="Day 4">Day 4</option>
-  <option value="Day 5">Day 5</option>
-  <option value="Day 6">Day 6</option>
-  <option value="Day 7">Day 7</option>
-  <option value="Day 8">Day 8</option>
-  <option value="Day 9">Day 9</option>
-  <option value="Day 10">Day 10</option>
-  <option value="Day 11">Day 11</option>
-  <option value="Day 12">Day 12</option>
-  <option value="Day 13">Day 13</option>
-  <option value="Day 14">Day 14</option>
-  <option value="Day 15">Day 15</option>
-</select>
+      <label class="block mb-2">Batch ID <span class="text-red-500">*</span></label>
+      <input id="batchId" type="text" class="w-full p-2 border rounded mb-4">
+
+      <div id="questionsContainer"></div>
+
+      <label class="block mt-4 mb-2">Quiz Marks <span class="text-red-500">*</span></label>
+      <input id="quizMarks" type="number" min="0" max="100" class="w-full p-2 border rounded mb-4" oninput="calculateScore()">
+
+      <div class="p-4 bg-gray-50 rounded border mt-4">
+        <p><b>Weightage Score:</b> <span id="weightageScore">0.00</span></p>
+        <p><b>Grade:</b> <span id="grade">-</span></p>
+      </div>
+      <div class="mb-4">
+        <label class="block mb-1">Additional Comments (Optional)</label>
+        <textarea id="additionalComments" rows="3" class="w-full p-2 border rounded" placeholder="Write any comments here..."></textarea>
+      </div>
+      <div class="mb-4">
+        <label class="block mb-1">Additional Comments (Optional)</label>
+        <textarea id="additionalComments" rows="3" class="w-full p-2 border rounded" placeholder="Write any comments here..."></textarea>
+      </div>
+      
+      <div class="flex justify-between mt-6">
+        <button type="button" class="btn-secondary" onclick="showPage(2)">← Back</button>
+        <button id="submitBtn" type="button" class="btn-primary" onclick="validateFeedback()">✅ Submit Feedback</button>
+      </div>
+    </div>
+
+  </div>
 
 <script>
-// ✅ Lock & save day
-function lockDay() {
-  const daySelect = document.getElementById("daySelect");
-  if (daySelect.value) {
-    daySelect.disabled = true;
-    localStorage.setItem("lockedDay", daySelect.value); // save for GitHub Pages reloads
-  }
+/* ======= Cleaned JS for multi-page form (no nested <script> tags) ======= */
+
+const faculties = ["Sandeep Agarwal","Bhanu Dhir","Shekhar Sharma","Anju Gupta","Preeti Goel","Rohit Agarwal","Sunita Rathore"];
+let completedFaculties = [];
+const questions = [
+  "Attendance & Punctuality","Discipline","Active Participation",
+  "Group Activities & Teamwork","Presentation - Content","Presentation - Delivery","Communication Skills",
+  "Analytical Thinking","Creativity & Innovation","Professional Ethics Awareness","Emotional Intelligence","Overall Engagement","Professional Dress Code",
+      "Industry/ Practice real life examples","Accessibility for clarification","Personalised guidance","Inspiring / motivating"
+];
+
+let currentPage = 1;
+
+function showPage(n) {
+  currentPage = n;
+  document.querySelectorAll(".form-page").forEach(p => p.style.display = "none");
+  document.getElementById("page"+n).style.display = "block";
+  if(n===2) loadFaculties();
+  if(n===3) loadQuestions();
 }
 
-// ✅ Restore locked day when page loads
-window.addEventListener("DOMContentLoaded", () => {
-  const savedDay = localStorage.getItem("lockedDay");
-  if (savedDay) {
-    const daySelect = document.getElementById("daySelect");
-    daySelect.value = savedDay;
-    daySelect.disabled = true;
-  }
-});
-</script>
-
-      <label>Student Unique Key (SRN):</label>
-      <select id="uniqueKeySelect">
-        <option value="">-- Select SRN --</option>
-      </select>
-
-      <button class="btn" onclick="prevPage()">⬅ Back</button>
-      <button class="btn" onclick="submitForm()">✅ Submit</button>
-    </div>
-
-<!-- PAGE 3: Feedback Questions -->
-<div class="form-page" id="page3">
-  <h2 class="text-xl font-semibold mb-4 text-center">Feedback Questions</h2>
-  <div id="questionsContainer" class="space-y-4"></div>
-  <div id="resultBox" class="mt-6 p-4 border rounded bg-gray-100">
-    <p class="text-lg font-semibold">Weightage Score: <span id="finalScore">0</span></p>
-    <p class="text-lg font-semibold">Grade: <span id="finalGrade">-</span></p>
-  </div>
-  <div class="flex justify-between mt-6">
-    <button type="button" onclick="prevPage()" class="bg-gray-500 text-white px-4 py-2 rounded">Back</button>
-    <button type="button" onclick="SubmitFeedback()" class="bg-blue-600 text-white px-4 py-2 rounded">Submit Feedback</button>
-  </div>
-</div>
-
-<!-- PAGE 4: Thank You -->
-<div class="form-page" id="page4">
-  <div class="text-center p-6">
-    <h2 class="text-2xl font-bold mb-4">Thank You!</h2>
-    <p class="text-lg mb-6">Your feedback has been successfully submitted.</p>
-    <div class="bg-white shadow-md rounded-lg p-6 max-w-xl mx-auto mt-6">
-      <h3 class="text-xl font-semibold mb-2">✨ Daily Motivational Quote ✨</h3>
-      <p id="dailyQuote" class="italic text-gray-700"></p>
-    </div>
-    <!-- ✅ Show submitted results here -->
-    <div id="submittedResult" class="mt-6"></div>
-  </div>
-</div>
-
-<script>
-  // ================= Regions & Branches =================
-  const branches = {
-    "CIRC": ["Agra","Ajmer","Aligarh","Alwar","Bareilly","Beawar","Bhagalpur","Bharatpur","Bhilai","Bhilwara","Bhiwani","Bhopal","Bikaner","Bilaspur","Bulandshahr","Darbhanga","Dehradun","Dhanbad","Gautam Budh Nagar","Ghaziabad","Gorakhpur","Gwalior","Haldwani","Hanumangarh","Haridwar","Indore","Jabalpur","Jaipur","Jamshedpur","Jhansi","Jodhpur","Kishangarh","Kota","Lucknow","Mathura","Meerut","Moradabad","Muzaffarnagar","Muzaffarpur","Neemuch","Pali","Patna","Prayagraj","Raigarh","Raipur","Rajsamand","Ranchi","Ratlam","Saharanpur","Satna","Sikar","Sriganganagar","Tonk","Udaipur","Ujjain","Varanasi"],
-    "WIRC": ["Ahmedabad","Ahmednagar","Akola","Amravati","Anand","Bharuch","Bhavnagar","Bhuj","Dhule","Gandhidham","Gandhinagar","Goa","Ichalkaranji","Jalgaon","Jamnagar","Kolhapur","Kalyan Dombivli","Latur","Nagpur","Nanded","Nashik","Navi Mumbai","Navsari","Pimpri Chinchwad","Pune","Rajkot","Ratnagiri","Sangli","Satara","Solapur","Surat","Thane","Vadodara","Vapi","Vasai"],
-    "SIRC": ["Alappuzha","Anantapur","Ballari","Belagavi","Bengaluru","Chengalpattu","Chhatrapati Sambhajinagar (Aurangabad)","Coimbatore","Ernakulam","Erode","Guntur","Hubballi","Hyderabad","Kadapa","Kakinada","Kalaburagi","Kannur","Karimnagar","Karnal","Kollam","Kottayam","Kozhikode","Kumbakonam","Kurnool","Madurai","Mangaluru","Mysuru","Nellore","Ongole","Palakkad","Puducherry","Rajamahendravaram","Salem","Sivakasi","Thiruvananthapuram","Thoothukudi","Thrissur","Tiruchirapalli","Tirunelveli","Tirupati","Tirupur","Udupi","Vellore","Vijayawada","Visakhapatnam","Vizianagaram","Warangal","West Godavari"],
-    "EIRC": ["Asansol","Bhubaneswar","Brahmapur","Cuttack","Dibrugarh","Durgapur","Guwahati","Jharsuguda","Raniganj","Rourkela","Sambalpur","Siliguri","Tinsukia"],
-    "NIRC": ["Ambala","Amritsar","Bahadurgarh","Bathinda","Chandigarh","Faridabad","Gurugram","Hisar","Jalandhar","Jammu And Kashmir","Kaithal","Karnal","Kurukshetra","Ludhiana","Mandi Gobindgarh","Panipat","Patiala","Rewari","Rohtak","Sirsa","Sonepat","Yamunanagar","Himachal Pradesh"],
-    "FIRC": ["Dubai"]
-  };
-
-  function updateBranches() {
-    const region = document.getElementById("regionSelect").value;
-    const branchSelect = document.getElementById("branchSelect");
-    branchSelect.innerHTML = '<option value="">-- Select Branch --</option>';
-    if (region && branches[region]) {
-      branches[region].forEach(branch => {
-        const opt = document.createElement("option");
-        opt.value = branch;
-        opt.textContent = branch;
-        branchSelect.appendChild(opt);
-      });
-    }
-  }
-</script>
-
-<script>
-  // Feedback Questions Logic (same as your code)
-  const questions = [
-    "Subject knowledge","Session planning & structure","Communication skills",
-    "Engagement & interaction","Innovative methods","Time management",
-    "Adherence to guidelines","Response to questions","Practical examples",
-    "Professional conduct","Technology use","Discipline",
-    "Student feedback","Contribution to growth","Overall impact"
-  ];
-
-  function renderQuestions() {
-    const container = document.getElementById("questionsContainer");
-    questions.forEach((q, i) => {
-      const block = document.createElement("div");
-      block.innerHTML = `
-        <label class="block mb-2">${i+1}. ${q}</label>
-        <select name="q${i+1}" class="ratingSelect w-full p-2 border rounded" required>
-          <option value="">-- Select Rating --</option>
-          <option value="20">1 - Poor (20)</option>
-          <option value="40">2 - Below Average (40)</option>
-          <option value="60">3 - Average (60)</option>
-          <option value="80">4 - Good (80)</option>
-          <option value="100">5 - Excellent (100)</option>
-        </select>
-      `;
-      container.appendChild(block);
-    });
-    document.querySelectorAll(".ratingSelect").forEach(sel => {
-      sel.addEventListener("change", updateLiveScore);
-    });
-  }
-  document.addEventListener("DOMContentLoaded", renderQuestions);
-
-  function updateLiveScore() {
-    const selects = document.querySelectorAll("#questionsContainer select");
-    let total = 0, count = 0;
-    selects.forEach(sel => {
-      if (sel.value) {
-        total += parseInt(sel.value);
-        count++;
-      }
-    });
-
-    const avg = count ? total / count : 0;
-    document.getElementById("finalScore").innerText = avg.toFixed(2);
-
-    let grade = "-";
-    if (avg >= 85) grade = "A+";
-    else if (avg >= 70) grade = "A";
-    else if (avg >= 50) grade = "B+";
-    else if (avg >= 30) grade = "B";
-    else if (avg > 0) grade = "C";
-
-    document.getElementById("finalGrade").innerText = grade;
-  }
-
-  function finalizeGrade() { nextPage(); }
-
-  // Page Navigation
-  let currentPage = 1;
-  function nextPage() {
-    document.getElementById("page" + currentPage).classList.remove("active-page");
-    currentPage++;
-    document.getElementById("page" + currentPage).classList.add("active-page");
-  }
-  function prevPage() {
-    document.getElementById("page" + currentPage).classList.remove("active-page");
-    currentPage--;
-    document.getElementById("page" + currentPage).classList.add("active-page");
-  }
-
-  // Excel Template
-  function downloadTemplate() {
-    const wb = XLSX.utils.book_new();
-    const wsData = [["S.No", "SRN", "Name"]];
-    const ws = XLSX.utils.aoa_to_sheet(wsData);
-    XLSX.utils.book_append_sheet(wb, ws, "Template");
-    XLSX.writeFile(wb, "Student_Template.xlsx");
-  }
-
-  // File Upload
-  function handleFileUpload(event) {
-    const file = event.target.files[0];
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      const data = new Uint8Array(e.target.result);
-      const workbook = XLSX.read(data, { type: "array" });
-      const sheetName = workbook.SheetNames[0];
-      const sheet = workbook.Sheets[sheetName];
-      const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-
-      let srnList = [];
-      for (let i = 1; i < jsonData.length; i++) {
-        if (jsonData[i][1]) srnList.push(jsonData[i][1]);
-      }
-
-      const dropdown = document.getElementById("uniqueKeySelect");
-      dropdown.innerHTML = '<option value="">-- Select SRN --</option>';
-      srnList.forEach(srn => {
-        const opt = document.createElement("option");
-        opt.value = srn;
-        opt.textContent = srn;
-        dropdown.appendChild(opt);
-      });
-
-      alert("✅ Student SRNs loaded successfully!");
-    };
-    reader.readAsArrayBuffer(file);
-  }
-
-  // Submit Form
-  function submitForm() {
-    document.getElementById("page" + currentPage).classList.remove("active-page");
-    currentPage++;
-    document.getElementById("page" + currentPage).classList.add("active-page");
-  }
-// Submit Feedback Function
-function SubmitFeedback() {
-  // Update score before final submit
-  updateLiveScore();
-
-  const finalScore = document.getElementById("finalScore").innerText;
-  const finalGrade = document.getElementById("finalGrade").innerText;
-
-  // Get selected SRN
-  const srnDropdown = document.getElementById("srnDropdown");
-  const selectedSRN = srnDropdown.value;
-
-  if (!selectedSRN) {
-    alert("⚠️ Please select a student before submitting.");
+function validatePage1(){
+  const studentName = document.getElementById("studentName").value.trim();
+  const regNumber = document.getElementById("regNumber").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const mobile = document.getElementById("mobile").value.trim();
+  
+  if(!studentName || !regNumber || !email || !mobile){
+    alert("⚠️ Please fill all fields");
     return;
   }
 
-  // ✅ Alert after submit
-  alert(`✅ Student ${selectedSRN} form submitted successfully!`);
+  const regPattern = /^(CRO|NRO|FRO|SRO|ERO|WRO)\d{7}$/i;
+  if(!regPattern.test(regNumber)){
+    alert("⚠️ Invalid Registration Number format!(CRO|NRO|FRO|SRO|ERO|WRO01234567)");
+    return;
+  }
 
-  // ✅ Remove submitted SRN from dropdown
-  srnDropdown.querySelector(`option[value='${selectedSRN}']`).remove();
+  if(!/^[6-9]\d{9}$/.test(mobile)){
+    alert("⚠️ Invalid mobile number!");
+    return;
+  }
 
-  // ✅ Reset result box for next student
-  document.getElementById("finalScore").innerText = "0";
-  document.getElementById("finalGrade").innerText = "-";
+  if(!email.includes("@") || !email.includes(".")){
+    alert("⚠️ Invalid email address!");
+    return;
+  }
 
-  // ✅ Check if SRN left
-  if (srnDropdown.options.length > 1) {
-    // Students left → back to Page 2
-    document.getElementById("page" + currentPage).classList.remove("active-page");
-    currentPage = 2;
-    document.getElementById("page" + currentPage).classList.add("active-page");
-  } else {
-    // All done → go to Thank You page
-    document.getElementById("page" + currentPage).classList.remove("active-page");
-    currentPage = 4;
-    document.getElementById("page" + currentPage).classList.add("active-page");
+  // ✅ Only move if all checks pass
+  showPage(2);  
+}
 
-    // Show final message
-    const thankYouDiv = document.querySelector("#page4 .text-center");
-    if (thankYouDiv) {
-      const resultMsg = document.createElement("p");
-      resultMsg.className = "mt-4 text-lg font-semibold text-green-700";
-      resultMsg.innerText = `🎉 All students have submitted their feedback successfully!`;
-      thankYouDiv.appendChild(resultMsg);
-    }
+function validatePage2() {
+  const faculty = document.getElementById("facultySelect").value;
+  if(!faculty){ 
+    alert("⚠️ Please select a faculty!"); 
+    return; 
+  }
+  showPage(3);
+}
+
+validateFeedback
+function loadFaculties(){
+  const select = document.getElementById("facultySelect");
+  select.innerHTML = `<option value="">-- Select Faculty --</option>`;
+  const available = faculties.filter(f=>!completedFaculties.includes(f));
+  if(available.length===0){
+    select.innerHTML=`<option value="">No faculties left</option>`;
+    select.disabled=true;
+  }else{
+    available.forEach(f=>{
+      const opt = document.createElement("option");
+      opt.value = f;
+      opt.textContent = f;
+      select.appendChild(opt);
+    });
+    select.disabled=false;
   }
 }
 
-// ✅ Day dropdown refresh hone par open rahe
-document.addEventListener("DOMContentLoaded", () => {
-  const dayDropdown = document.getElementById("dayDropdown");
+function loadQuestions() {
+  const container = document.getElementById("questionsContainer");
+  container.innerHTML = "";
 
-  // By default unlock
-  dayDropdown.disabled = false;
-
-  // Jab user ek day select kare → freeze
-  dayDropdown.addEventListener("change", () => {
-    if (dayDropdown.value) {
-      dayDropdown.disabled = true;
-    }
-  });
-});
-  // Daily Quote
-  const quotes = [
-    "Success is not final, failure is not fatal: it is the courage to continue that counts.",
-    "The best way to predict the future is to create it.",
-    "Dream big. Start small. Act now.",
-    "Believe you can and you're halfway there.",
-    "Push yourself, because no one else is going to do it for you.",
-    "Great things never come from comfort zones."
+  // --- Rating questions ---
+  const ratingQuestions = [
+    "Attendance & Punctuality",
+    "Discipline",
+    "Active Participation",
+    "Group Activities & Teamwork",
+    "Presentation - Content",
+    "Presentation - Delivery",
+    "Communication Skills",
+    "Analytical Thinking",
+    "Creativity & Innovation",
+    "Professional Ethics Awareness",
+    "Emotional Intelligence",
+    "Overall Engagement",
+    "Professional Dress Code"
   ];
-  function showDailyQuote() {
-    const today = new Date().getDate();
-    document.getElementById("dailyQuote").innerText = quotes[today % quotes.length];
+
+  ratingQuestions.forEach((q, i) => {
+    container.innerHTML += `<div class="mb-4">
+      <label class="block mb-1">${q} <span class="text-red-500">*</span></label>
+      <select id="q${i}" class="w-full p-2 border rounded" onchange="calculateScore()">
+        <option value="">--Select--</option>
+        <option value="20">1. POOR</option>
+        <option value="40">2. BELOW AVERAGE</option>
+        <option value="60">3. AVERAGE</option>
+        <option value="80">4. GOOD</option>
+        <option value="100">5. EXCELLENT</option>
+      </select>
+    </div>`;
+  });
+
+  // --- Option questions ---
+  const optionQuestions = [
+    "Industry/ Practice real life examples",
+    "Accessibility for clarification",
+    "Personalised guidance",
+    "Inspiring / motivating"
+  ];
+
+  optionQuestions.forEach((q, i) => {
+    const id = "paraQ" + i;
+    container.innerHTML += `<div class="mb-4">
+      <label class="block mb-1">${q} <span class="text-red-500">*</span></label>
+      <select id="${id}" class="w-full p-2 border rounded" onchange="calculateScore()">
+        <option value="">--Select--</option>
+        <option value="Excellent">Excellent</option>
+        <option value="Good">Good</option>
+        <option value="Average">Average</option>
+        <option value="Poor">Poor</option>
+      </select>
+    </div>`;
+  });
+
+  // --- Additional Comments (Optional) ---
+  container.innerHTML += `
+    <div class="mb-4">
+      <label class="block mb-1">Additional Comments (Optional)</label>
+      <textarea id="additionalComments" rows="3" class="w-full p-2 border rounded" placeholder="Write any comments here..."></textarea>
+    </div>
+  `;
+
+  // --- Reset score display ---
+  document.getElementById("weightageScore").innerText = "0.00";
+  document.getElementById("grade").innerText = "-";
+}
+function calculateScore(){
+  let total = 0, count = 0;
+
+  // --- First 13 rating questions ---
+  for (let i = 0; i < 13; i++){
+    const val = parseInt(document.getElementById("q" + i)?.value || 0, 10);
+    if(val){ total += val; count++; }
   }
-  document.addEventListener("DOMContentLoaded", showDailyQuote);
+
+  // --- Last 4 option questions ---
+  for (let i = 0; i < 4; i++){
+    const valStr = document.getElementById("paraQ" + i)?.value || "";
+    let val = 0;
+    if(valStr === "Excellent") val = 100;
+    else if(valStr === "Good") val = 80;
+    else if(valStr === "Average") val = 60;
+    else if(valStr === "Poor") val = 40;
+
+    if(val){ total += val; count++; }
+  }
+
+  // --- Average score calculation ---
+  const avg = count > 0 ? total / count : 0;
+  const quiz = parseFloat(document.getElementById("quizMarks")?.value || 0);
+  const weightage = (avg + quiz) / 2;
+  document.getElementById("weightageScore").innerText = weightage.toFixed(2);
+
+  // --- Grade assignment ---
+  let grade = "C";
+  if(weightage >= 85) grade = "A+";
+  else if(weightage >= 70) grade = "A";
+  else if(weightage >= 50) grade = "B+";
+  else if(weightage >= 30) grade = "B";
+  document.getElementById("grade").innerText = grade;
+}
+
+/* Initialize after DOM ready */
+document.addEventListener('DOMContentLoaded', () => {
+  showPage(1);
+  // (faculties/questions are loaded automatically when you land on their pages)
+});
 </script>
 </body>
 </html>
-
 
 
 
