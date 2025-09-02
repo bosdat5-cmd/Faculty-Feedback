@@ -2,17 +2,17 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Teaching Effectiveness Feedback</title>
+  <title>Faculty Feedback Form</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <style>
     body {
       font-family: 'Poppins', sans-serif;
-      background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+      background: #f5f7fb;
       margin: 0;
       padding: 0;
       display: flex;
       justify-content: center;
-      align-items: flex-start;
       min-height: 100vh;
     }
     .container {
@@ -20,15 +20,23 @@
       margin: 40px auto;
       padding: 30px;
       border-radius: 20px;
-      width: 650px;
-      box-shadow: 0 6px 25px rgba(0,0,0,0.2);
-      animation: fadeIn 0.5s ease-in-out;
+      width: 700px;
+      box-shadow: 0 6px 25px rgba(0,0,0,0.15);
+    }
+    h1 {
+      text-align: center;
+      font-size: 26px;
+      font-weight: 700;
+      background: linear-gradient(90deg, #673ab7, #3f51b5, #2196f3);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 10px;
     }
     h2 {
       text-align: center;
-      color: #fff;
-      padding: 15px;
-      border-radius: 12px;
+      font-size: 18px;
+      font-weight: 600;
+      color: #444;
       margin-bottom: 20px;
     }
     label {
@@ -37,7 +45,7 @@
       margin: 8px 0 5px;
       color: #333;
     }
-    input, textarea {
+    input, textarea, select {
       width: 100%;
       padding: 10px;
       border: 1px solid #ccc;
@@ -47,13 +55,13 @@
       margin-bottom: 15px;
       transition: all 0.3s;
     }
-    input:focus, textarea:focus {
-      border-color: #6a11cb;
-      box-shadow: 0 0 6px rgba(106,17,203,0.5);
+    input:focus, textarea:focus, select:focus {
+      border-color: #3f51b5;
+      box-shadow: 0 0 6px rgba(63,81,181,0.5);
     }
     .btn {
       display: inline-block;
-      background: linear-gradient(45deg,#6a11cb,#2575fc);
+      background: linear-gradient(90deg,#3f51b5,#2196f3);
       color: #fff;
       border: none;
       border-radius: 10px;
@@ -70,51 +78,22 @@
     }
     .form-page { display: none; }
     .active-page { display: block; }
-
-    /* Multi-color cards for questions */
     .q-card {
+      background: #f8f9ff;
       padding: 15px;
       border-radius: 12px;
       margin-bottom: 15px;
-      color: #fff;
-      animation: fadeIn 0.5s ease-in-out;
+      border: 1px solid #ddd;
     }
-    .q1 { background: linear-gradient(135deg, #43cea2, #185a9d); }
-    .q2 { background: linear-gradient(135deg, #ff9966, #ff5e62); }
-    .q3 { background: linear-gradient(135deg, #36d1dc, #5b86e5); }
-    .q4 { background: linear-gradient(135deg, #f7971e, #ffd200); color:#222; }
-    .q5 { background: linear-gradient(135deg, #b24592, #f15f79); }
-    .q6 { background: linear-gradient(135deg, #11998e, #38ef7d); color:#222; }
-    .q7 { background: linear-gradient(135deg, #8e2de2, #4a00e0); }
-
     .radio-option {
       margin: 4px 0;
-      font-weight: 500;
     }
-
     .thankyou {
       text-align: center;
-      color: #2575fc;
+      color: #2196f3;
       font-size: 22px;
       font-weight: 700;
       margin-top: 20px;
-    }
-
-    .result-box {
-      margin-top: 20px;
-      padding: 20px;
-      border-radius: 12px;
-      text-align: center;
-      font-size: 18px;
-      font-weight: 600;
-      color: #fff;
-      background: linear-gradient(45deg,#43cea2,#185a9d);
-      animation: fadeIn 0.8s ease-in-out;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
     }
   </style>
 </head>
@@ -122,131 +101,144 @@
 
   <div class="container">
 
-    <!-- Page 1 -->
-    <div id="page1" class="form-page active-page">
-      <h2 style="background:linear-gradient(45deg,#43cea2,#185a9d);">Basic Information</h2>
+    <h1>THE INSTITUTE OF CHARTERED ACCOUNTANTS OF INDIA</h1>
+    <h2>Faculty Self-Evaluation Form – Chartered Accountancy Educators</h2>
 
-      <label>Name <span class="text-red-500">*</span></label>
-      <input id="name" type="text">
+    <!-- Page 0 (Upload Excel + SRN selection) -->
+    <div id="page0" class="form-page active-page">
+      <label>📥 Download Template</label>
+      <button class="btn" onclick="downloadTemplate()">Download Excel Template</button>
 
-      <label>Subject(s) Taught <span class="text-red-500">*</span></label>
-      <input id="subject" type="text">
+      <label>📤 Upload Student Excel</label>
+      <input type="file" id="excelFile" accept=".xlsx" onchange="uploadExcel(event)">
 
-      <label>Institution/Academy <span class="text-red-500">*</span></label>
-      <input id="institution" type="text">
-
-      <label>Period of Evaluation <span class="text-red-500">*</span></label>
-      <input id="period" type="text" placeholder="e.g. Jan - Mar 2025">
+      <label>Select SRN for Feedback *</label>
+      <select id="srnDropdown"></select>
 
       <div style="text-align:right;">
-        <button type="button" class="btn" onclick="validatePage1()">Next →</button>
+        <button type="button" class="btn" onclick="startFeedback()">Start →</button>
       </div>
     </div>
 
-    <!-- Page 2 -->
-    <div id="page2" class="form-page">
-      <h2 style="background:linear-gradient(45deg,#ff9966,#ff5e62);">Teaching Effectiveness</h2>
+    <!-- Page 1 (Feedback Questions) -->
+    <div id="page1" class="form-page">
       <div id="questionsContainer"></div>
-
       <div style="text-align:right;">
-        <button type="button" class="btn" onclick="showPage(1)">← Back</button>
-        <button type="button" class="btn" onclick="validateFeedback()">Submit ✅</button>
+        <button type="button" class="btn" onclick="submitFeedback()">Submit ✅</button>
       </div>
     </div>
 
-    <!-- Page 3 -->
-    <div id="page3" class="form-page">
-      <h2 style="background:linear-gradient(45deg,#6a11cb,#2575fc);">Feedback Submitted</h2>
-      <p class="thankyou">🎉 Thank you for your valuable feedback!</p>
-      <div id="resultBox" class="result-box" style="display:none;"></div>
+    <!-- Page 2 (Thank You / Next SRN) -->
+    <div id="page2" class="form-page">
+      <p class="thankyou">🎉 Feedback submitted successfully!</p>
+      <button class="btn" onclick="nextStudent()">➡ Next Student</button>
     </div>
 
   </div>
 
 <script>
-function showPage(n) {
-  document.querySelectorAll(".form-page").forEach(p => p.style.display = "none");
-  document.getElementById("page"+n).style.display = "block";
-  if(n===2) loadQuestions();
+let students = [];
+let currentSRN = null;
+
+// Download Excel template
+function downloadTemplate() {
+  const ws_data = [["S.No", "SRN", "Name"], ["1", "SRN001", "John Doe"]];
+  const ws = XLSX.utils.aoa_to_sheet(ws_data);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Template");
+  XLSX.writeFile(wb, "StudentTemplate.xlsx");
 }
 
-function validatePage1() {
-  const name = document.getElementById("name").value.trim();
-  const subject = document.getElementById("subject").value.trim();
-  const institution = document.getElementById("institution").value.trim();
-  const period = document.getElementById("period").value.trim();
+// Upload Excel
+function uploadExcel(event) {
+  const file = event.target.files[0];
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const data = new Uint8Array(e.target.result);
+    const workbook = XLSX.read(data, { type: "array" });
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+    students = XLSX.utils.sheet_to_json(sheet);
 
-  if(!name || !subject || !institution || !period){
-    alert("⚠️ Please fill all fields!");
-    return;
-  }
-  showPage(2);
+    let dropdown = document.getElementById("srnDropdown");
+    dropdown.innerHTML = "";
+    students.forEach(s => {
+      if(s.SRN) dropdown.innerHTML += `<option value="${s.SRN}">${s.SRN} - ${s.Name}</option>`;
+    });
+  };
+  reader.readAsArrayBuffer(file);
 }
 
+// Start feedback
+function startFeedback() {
+  const dropdown = document.getElementById("srnDropdown");
+  if(!dropdown.value) { alert("⚠ Please select an SRN"); return; }
+  currentSRN = dropdown.value;
+  loadQuestions();
+  showPage(1);
+}
+
+// Load questions
 function loadQuestions() {
   const container = document.getElementById("questionsContainer");
   container.innerHTML = "";
 
   const questions = [
-    "Subject knowledge and updates",
-    "Clarity in explanation",
-    "Use of examples & case studies",
-    "Engagement with students",
-    "Responsiveness to queries",
-    "Integration of values & ethics",
-    "Use of technology/tools"
+    "Attendance & Punctuality",
+    "Discipline",
+    "Active Participation",
+    "Teamwork & Collaboration",
+    "Presentation Skills",
+    "Teaching Style & Clarity",
+    "Interaction with Students"
   ];
 
   questions.forEach((q, i) => {
     container.innerHTML += `
-      <div class="q-card q${i+1}">
-        <label>${q} <span>*</span></label>
-        <div class="radio-option"><input type="radio" name="q${i}" value="1"> 1. Poor</div>
-        <div class="radio-option"><input type="radio" name="q${i}" value="2"> 2. Below Average</div>
-        <div class="radio-option"><input type="radio" name="q${i}" value="3"> 3. Average</div>
-        <div class="radio-option"><input type="radio" name="q${i}" value="4"> 4. Good</div>
-        <div class="radio-option"><input type="radio" name="q${i}" value="5"> 5. Excellent</div>
+      <div class="q-card">
+        <label>${q} *</label>
+        <div class="radio-option"><input type="radio" name="q${i}" value="1"> Poor</div>
+        <div class="radio-option"><input type="radio" name="q${i}" value="2"> Below Average</div>
+        <div class="radio-option"><input type="radio" name="q${i}" value="3"> Average</div>
+        <div class="radio-option"><input type="radio" name="q${i}" value="4"> Good</div>
+        <div class="radio-option"><input type="radio" name="q${i}" value="5"> Excellent</div>
       </div>`;
   });
-
-  // Optional Comments
-  container.innerHTML += `
-    <div class="q-card" style="background:linear-gradient(135deg,#36d1dc,#5b86e5);">
-      <label>Additional Comments (Optional)</label>
-      <textarea id="comments" rows="3"></textarea>
-    </div>`;
 }
 
-function validateFeedback() {
-  let total = 0;
-  let count = 7; // total mandatory questions
-
+// Submit feedback
+function submitFeedback() {
+  let count = 7;
   for (let i = 0; i < count; i++) {
     const selected = document.querySelector('input[name="q'+i+'"]:checked');
-    if(!selected){
-      alert("⚠️ Please answer all mandatory questions!");
-      return;
-    }
-    total += parseInt(selected.value);
+    if(!selected){ alert("⚠ Please answer all questions!"); return; }
   }
+  // mark SRN as completed
+  students = students.filter(s => s.SRN !== currentSRN);
+  showPage(2);
+}
 
-  // Calculate average
-  const avg = (total / count).toFixed(2);
-  let grade = "";
+// Next student
+function nextStudent() {
+  if(students.length === 0){
+    alert("✅ All student feedback completed!");
+    showPage(0);
+    document.getElementById("srnDropdown").innerHTML = "";
+    return;
+  }
+  let dropdown = document.getElementById("srnDropdown");
+  dropdown.innerHTML = "";
+  students.forEach(s => {
+    if(s.SRN) dropdown.innerHTML += `<option value="${s.SRN}">${s.SRN} - ${s.Name}</option>`;
+  });
+  showPage(0);
+}
 
-  if(avg >= 4.5) grade = "A (Excellent)";
-  else if(avg >= 3.5) grade = "B (Good)";
-  else grade = "C (Needs Improvement)";
-
-  // Show results
-  document.getElementById("resultBox").style.display = "block";
-  document.getElementById("resultBox").innerHTML = `
-    ⭐ Average Score: <b>${avg}</b> / 5<br>
-    🏅 Grade: <b>${grade}</b>
-  `;
-
-  showPage(3);
+// Show page
+function showPage(n) {
+  document.querySelectorAll(".form-page").forEach(p => p.style.display = "none");
+  document.getElementById("page"+n).style.display = "block";
 }
 </script>
+
 </body>
 </html>
