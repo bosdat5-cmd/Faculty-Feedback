@@ -2,251 +2,192 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Teaching Effectiveness Feedback</title>
+  <title>Faculty Self-Evaluation Form</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <style>
     body {
       font-family: 'Poppins', sans-serif;
-      background: linear-gradient(135deg, #ff9a9e, #fad0c4);
       margin: 0;
       padding: 0;
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      min-height: 100vh;
-    }
-    .container {
-      background: #fff;
-      margin: 40px auto;
-      padding: 30px;
-      border-radius: 20px;
-      width: 650px;
-      box-shadow: 0 6px 25px rgba(0,0,0,0.2);
-      animation: fadeIn 0.5s ease-in-out;
-    }
-    h2 {
-      text-align: center;
-      color: #fff;
-      padding: 15px;
-      border-radius: 12px;
-      margin-bottom: 20px;
-    }
-    label {
-      font-weight: 500;
-      display: block;
-      margin: 8px 0 5px;
+      background: linear-gradient(135deg, #f3f4f6, #e0f7fa);
       color: #333;
     }
-    input, textarea {
-      width: 100%;
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 10px;
-      outline: none;
-      font-size: 14px;
-      margin-bottom: 15px;
-      transition: all 0.3s;
-    }
-    input:focus, textarea:focus {
-      border-color: #6a11cb;
-      box-shadow: 0 0 6px rgba(106,17,203,0.5);
-    }
-    .btn {
-      display: inline-block;
-      background: linear-gradient(45deg,#6a11cb,#2575fc);
-      color: #fff;
-      border: none;
-      border-radius: 10px;
-      padding: 12px 20px;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      margin: 10px 5px 0 0;
-      transition: all 0.3s;
-    }
-    .btn:hover {
-      transform: scale(1.07);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    }
-    .form-page { display: none; }
-    .active-page { display: block; }
 
-    /* Multi-color cards for questions */
-    .q-card {
-      padding: 15px;
-      border-radius: 12px;
-      margin-bottom: 15px;
-      color: #fff;
-      animation: fadeIn 0.5s ease-in-out;
-    }
-    .q1 { background: linear-gradient(135deg, #43cea2, #185a9d); }
-    .q2 { background: linear-gradient(135deg, #ff9966, #ff5e62); }
-    .q3 { background: linear-gradient(135deg, #36d1dc, #5b86e5); }
-    .q4 { background: linear-gradient(135deg, #f7971e, #ffd200); color:#222; }
-    .q5 { background: linear-gradient(135deg, #b24592, #f15f79); }
-    .q6 { background: linear-gradient(135deg, #11998e, #38ef7d); color:#222; }
-    .q7 { background: linear-gradient(135deg, #8e2de2, #4a00e0); }
-
-    .radio-option {
-      margin: 4px 0;
-      font-weight: 500;
-    }
-
-    .thankyou {
+    header {
       text-align: center;
-      color: #2575fc;
-      font-size: 22px;
-      font-weight: 700;
-      margin-top: 20px;
-    }
-
-    .result-box {
-      margin-top: 20px;
       padding: 20px;
-      border-radius: 12px;
-      text-align: center;
+      background: linear-gradient(90deg, #ff4081, #3f51b5, #4caf50);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    header h1 {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+
+    header h2 {
       font-size: 18px;
       font-weight: 600;
-      color: #fff;
-      background: linear-gradient(45deg,#43cea2,#185a9d);
-      animation: fadeIn 0.8s ease-in-out;
+      color: #444;
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
+    .form-page {
+      display: none;
+      padding: 30px;
+      max-width: 800px;
+      margin: auto;
+      background: #fff;
+      border-radius: 15px;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+      margin-top: 20px;
+    }
+
+    .active {
+      display: block;
+    }
+
+    label {
+      font-weight: 600;
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    select, input {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 20px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+
+    button {
+      padding: 10px 18px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      margin: 5px;
+      background: linear-gradient(90deg, #2196f3, #21cbf3);
+      color: #fff;
+      transition: all 0.3s;
+    }
+
+    button:hover {
+      transform: scale(1.05);
+      background: linear-gradient(90deg, #21cbf3, #2196f3);
+    }
+
+    .thank-you {
+      text-align: center;
+      font-size: 22px;
+      font-weight: 600;
+      color: #4caf50;
     }
   </style>
 </head>
 <body>
 
-  <div class="container">
+  <header>
+    <h1>THE INSTITUTE OF CHARTERED ACCOUNTANTS OF INDIA</h1>
+    <h2>Faculty Self-Evaluation Form – Chartered Accountancy Educators</h2>
+  </header>
 
-    <!-- Page 1 -->
-    <div id="page1" class="form-page active-page">
-      <h2 style="background:linear-gradient(45deg,#43cea2,#185a9d);">Basic Information</h2>
+  <!-- Page 1 -->
+  <div class="form-page active" id="page1">
+    <label>Faculty Name *</label>
+    <input type="text" placeholder="Enter Faculty Name">
 
-      <label>Name <span class="text-red-500">*</span></label>
-      <input id="name" type="text">
+    <label>Student Registration Number (SRN) *</label>
+    <input type="text" placeholder="Enter SRN">
 
-      <label>Subject(s) Taught <span class="text-red-500">*</span></label>
-      <input id="subject" type="text">
-
-      <label>Institution/Academy <span class="text-red-500">*</span></label>
-      <input id="institution" type="text">
-
-      <label>Period of Evaluation <span class="text-red-500">*</span></label>
-      <input id="period" type="text" placeholder="e.g. Jan - Mar 2025">
-
-      <div style="text-align:right;">
-        <button type="button" class="btn" onclick="validatePage1()">Next →</button>
-      </div>
-    </div>
-
-    <!-- Page 2 -->
-    <div id="page2" class="form-page">
-      <h2 style="background:linear-gradient(45deg,#ff9966,#ff5e62);">Teaching Effectiveness</h2>
-      <div id="questionsContainer"></div>
-
-      <div style="text-align:right;">
-        <button type="button" class="btn" onclick="showPage(1)">← Back</button>
-        <button type="button" class="btn" onclick="validateFeedback()">Submit ✅</button>
-      </div>
-    </div>
-
-    <!-- Page 3 -->
-    <div id="page3" class="form-page">
-      <h2 style="background:linear-gradient(45deg,#6a11cb,#2575fc);">Feedback Submitted</h2>
-      <p class="thankyou">🎉 Thank you for your valuable feedback!</p>
-      <div id="resultBox" class="result-box" style="display:none;"></div>
-    </div>
-
+    <button onclick="nextPage(2)">Next</button>
   </div>
 
-<script>
-function showPage(n) {
-  document.querySelectorAll(".form-page").forEach(p => p.style.display = "none");
-  document.getElementById("page"+n).style.display = "block";
-  if(n===2) loadQuestions();
-}
+  <!-- Page 2 -->
+  <div class="form-page" id="page2">
+    <label>Attendance & Punctuality *</label>
+    <select>
+      <option value="">--Select--</option>
+      <option>Excellent</option>
+      <option>Good</option>
+      <option>Average</option>
+      <option>Poor</option>
+    </select>
 
-function validatePage1() {
-  const name = document.getElementById("name").value.trim();
-  const subject = document.getElementById("subject").value.trim();
-  const institution = document.getElementById("institution").value.trim();
-  const period = document.getElementById("period").value.trim();
+    <label>Discipline *</label>
+    <select>
+      <option value="">--Select--</option>
+      <option>Excellent</option>
+      <option>Good</option>
+      <option>Average</option>
+      <option>Poor</option>
+    </select>
 
-  if(!name || !subject || !institution || !period){
-    alert("⚠️ Please fill all fields!");
-    return;
-  }
-  showPage(2);
-}
+    <label>Active Participation *</label>
+    <select>
+      <option value="">--Select--</option>
+      <option>Excellent</option>
+      <option>Good</option>
+      <option>Average</option>
+      <option>Poor</option>
+    </select>
 
-function loadQuestions() {
-  const container = document.getElementById("questionsContainer");
-  container.innerHTML = "";
+    <button onclick="prevPage(1)">Back</button>
+    <button onclick="nextPage(3)">Next</button>
+  </div>
 
-  const questions = [
-    "Subject knowledge and updates",
-    "Clarity in explanation",
-    "Use of examples & case studies",
-    "Engagement with students",
-    "Responsiveness to queries",
-    "Integration of values & ethics",
-    "Use of technology/tools"
-  ];
+  <!-- Page 3 -->
+  <div class="form-page" id="page3">
+    <label>Group Activities & Teamwork *</label>
+    <select>
+      <option value="">--Select--</option>
+      <option>Excellent</option>
+      <option>Good</option>
+      <option>Average</option>
+      <option>Poor</option>
+    </select>
 
-  questions.forEach((q, i) => {
-    container.innerHTML += `
-      <div class="q-card q${i+1}">
-        <label>${q} <span>*</span></label>
-        <div class="radio-option"><input type="radio" name="q${i}" value="1"> 1. Poor</div>
-        <div class="radio-option"><input type="radio" name="q${i}" value="2"> 2. Below Average</div>
-        <div class="radio-option"><input type="radio" name="q${i}" value="3"> 3. Average</div>
-        <div class="radio-option"><input type="radio" name="q${i}" value="4"> 4. Good</div>
-        <div class="radio-option"><input type="radio" name="q${i}" value="5"> 5. Excellent</div>
-      </div>`;
-  });
+    <label>Presentation Skills *</label>
+    <select>
+      <option value="">--Select--</option>
+      <option>Excellent</option>
+      <option>Good</option>
+      <option>Average</option>
+      <option>Poor</option>
+    </select>
 
-  // Optional Comments
-  container.innerHTML += `
-    <div class="q-card" style="background:linear-gradient(135deg,#36d1dc,#5b86e5);">
-      <label>Additional Comments (Optional)</label>
-      <textarea id="comments" rows="3"></textarea>
-    </div>`;
-}
+    <label>Teaching Style & Clarity *</label>
+    <select>
+      <option value="">--Select--</option>
+      <option>Excellent</option>
+      <option>Good</option>
+      <option>Average</option>
+      <option>Poor</option>
+    </select>
 
-function validateFeedback() {
-  let total = 0;
-  let count = 7; // total mandatory questions
+    <button onclick="prevPage(2)">Back</button>
+    <button onclick="nextPage(4)">Submit</button>
+  </div>
 
-  for (let i = 0; i < count; i++) {
-    const selected = document.querySelector('input[name="q'+i+'"]:checked');
-    if(!selected){
-      alert("⚠️ Please answer all mandatory questions!");
-      return;
+  <!-- Page 4 (Thank You) -->
+  <div class="form-page" id="page4">
+    <div class="thank-you">
+      🎉 Thank you for submitting your feedback!  
+      <br> Your response has been recorded.
+    </div>
+  </div>
+
+  <script>
+    function nextPage(n) {
+      document.querySelectorAll('.form-page').forEach(p => p.classList.remove('active'));
+      document.getElementById("page" + n).classList.add('active');
     }
-    total += parseInt(selected.value);
-  }
-
-  // Calculate average
-  const avg = (total / count).toFixed(2);
-  let grade = "";
-
-  if(avg >= 4.5) grade = "A (Excellent)";
-  else if(avg >= 3.5) grade = "B (Good)";
-  else grade = "C (Needs Improvement)";
-
-  // Show results
-  document.getElementById("resultBox").style.display = "block";
-  document.getElementById("resultBox").innerHTML = `
-    ⭐ Average Score: <b>${avg}</b> / 5<br>
-    🏅 Grade: <b>${grade}</b>
-  `;
-
-  showPage(3);
-}
-</script>
+    function prevPage(n) {
+      document.querySelectorAll('.form-page').forEach(p => p.classList.remove('active'));
+      document.getElementById("page" + n).classList.add('active');
+    }
+  </script>
 </body>
 </html>
