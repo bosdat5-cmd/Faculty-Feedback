@@ -2,11 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>THE INSTITUTE OF CHARTERED ACCOUNTANTS OF INDIA</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <title>Teaching Effectiveness Feedback</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <style>
-    /* ✅ CSS untouched (same as yours) */
     body {
       font-family: 'Poppins', sans-serif;
       background: linear-gradient(135deg, #0077b6, #00b4d8);
@@ -19,15 +17,14 @@
     }
     .container {
       background: #fff;
-      margin-top: 40px;
+      margin: 40px auto;
       padding: 30px;
       border-radius: 15px;
-      width: 500px;
+      width: 600px;
       box-shadow: 0 6px 20px rgba(0,0,0,0.15);
       animation: fadeIn 0.5s ease-in-out;
     }
     h2 {
-      text-align: center;
       color: #023e8a;
       margin-bottom: 20px;
       font-weight: 600;
@@ -71,6 +68,20 @@
     }
     .form-page { display: none; }
     .active-page { display: block; }
+    .radio-group {
+      margin-bottom: 15px;
+    }
+    .radio-option {
+      display: block;
+      margin: 4px 0;
+    }
+    .thankyou {
+      text-align: center;
+      color: #023e8a;
+      font-size: 20px;
+      font-weight: 600;
+      margin-top: 20px;
+    }
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(20px); }
       to { opacity: 1; transform: translateY(0); }
@@ -79,20 +90,20 @@
 </head>
 <body>
 
-  <div class="max-w-3xl mx-auto mt-6 bg-white p-8 rounded-2xl shadow-lg">
+  <div class="container">
 
     <!-- Page 1: Basic Info -->
-    <div id="page1" class="form-page active-page card">
-      <h2 class="text-2xl font-semibold mb-4 text-blue-700">Basic Information</h2>
+    <div id="page1" class="form-page active-page">
+      <h2>Basic Information</h2>
 
       <label>Name <span class="text-red-500">*</span></label>
-      <input id="name" type="text" placeholder="Enter your name">
+      <input id="name" type="text">
 
       <label>Subject(s) Taught <span class="text-red-500">*</span></label>
-      <input id="subject" type="text" placeholder="Enter subject(s)">
+      <input id="subject" type="text">
 
       <label>Institution/Academy <span class="text-red-500">*</span></label>
-      <input id="institution" type="text" placeholder="Enter institution/academy">
+      <input id="institution" type="text">
 
       <label>Period of Evaluation <span class="text-red-500">*</span></label>
       <input id="period" type="text" placeholder="e.g. Jan - Mar 2025">
@@ -103,15 +114,22 @@
     </div>
 
     <!-- Page 2: Teaching Effectiveness -->
-    <div id="page2" class="form-page card">
-      <h2 class="text-2xl font-semibold mb-4 text-blue-700">Teaching Effectiveness</h2>
+    <div id="page2" class="form-page">
+      <h2>Teaching Effectiveness</h2>
+      <form id="feedbackForm">
+        <div id="questionsContainer"></div>
 
-      <div id="questionsContainer"></div>
+        <div class="flex justify-between mt-6">
+          <button type="button" class="btn" onclick="showPage(1)">← Back</button>
+          <button type="button" class="btn" onclick="validateFeedback()">Submit ✅</button>
+        </div>
+      </form>
+    </div>
 
-      <div class="flex justify-between mt-6">
-        <button type="button" class="btn" onclick="showPage(1)">← Back</button>
-        <button type="button" class="btn" onclick="validateFeedback()">✅ Submit Feedback</button>
-      </div>
+    <!-- Page 3: Thank You -->
+    <div id="page3" class="form-page">
+      <h2>Feedback Submitted</h2>
+      <p class="thankyou">✅ Thank you for your valuable feedback!</p>
     </div>
 
   </div>
@@ -120,9 +138,9 @@
 let currentPage = 1;
 
 function showPage(n) {
-  currentPage = n;
   document.querySelectorAll(".form-page").forEach(p => p.style.display = "none");
   document.getElementById("page"+n).style.display = "block";
+  currentPage = n;
   if(n===2) loadQuestions();
 }
 
@@ -155,16 +173,13 @@ function loadQuestions() {
 
   questions.forEach((q, i) => {
     container.innerHTML += `
-      <div class="mb-4">
+      <div class="radio-group">
         <label>${q} <span class="text-red-500">*</span></label>
-        <select id="q${i}" class="w-full p-2 border rounded">
-          <option value="">--Select--</option>
-          <option value="1">1. Poor</option>
-          <option value="2">2. Below Average</option>
-          <option value="3">3. Average</option>
-          <option value="4">4. Good</option>
-          <option value="5">5. Excellent</option>
-        </select>
+        <div class="radio-option"><input type="radio" name="q${i}" value="1"> 1. Poor</div>
+        <div class="radio-option"><input type="radio" name="q${i}" value="2"> 2. Below Average</div>
+        <div class="radio-option"><input type="radio" name="q${i}" value="3"> 3. Average</div>
+        <div class="radio-option"><input type="radio" name="q${i}" value="4"> 4. Good</div>
+        <div class="radio-option"><input type="radio" name="q${i}" value="5"> 5. Excellent</div>
       </div>`;
   });
 
@@ -178,12 +193,13 @@ function loadQuestions() {
 
 function validateFeedback() {
   for (let i = 0; i < 7; i++) {
-    if(!document.getElementById("q"+i).value){
+    const selected = document.querySelector('input[name="q'+i+'"]:checked');
+    if(!selected){
       alert("⚠️ Please answer all mandatory questions!");
       return;
     }
   }
-  alert("✅ Feedback submitted successfully!");
+  showPage(3);
 }
 </script>
 </body>
