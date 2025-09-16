@@ -6,12 +6,12 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
-body { font-family: 'Poppins', sans-serif; background:#f5f7fb; margin:0; padding:0; display:flex; justify-content:center; min-height:100vh; }
+body { font-family:'Poppins',sans-serif; background:#f5f7fb; margin:0; padding:0; display:flex; justify-content:center; min-height:100vh; }
 .container { background:#fff; margin:40px auto; padding:30px; border-radius:20px; width:700px; box-shadow:0 6px 25px rgba(0,0,0,0.15);}
 h1 { text-align:center; font-size:26px; font-weight:700; background:linear-gradient(90deg,#673ab7,#3f51b5,#2196f3); -webkit-background-clip:text; -webkit-text-fill-color:transparent; margin-bottom:10px; }
 h2 { text-align:center; font-size:18px; font-weight:600; color:#444; margin-bottom:20px; }
 label { font-weight:500; display:block; margin:8px 0 5px; color:#333; }
-input, select { width:100%; padding:10px; border:1px solid #ccc; border-radius:10px; outline:none; font-size:14px; margin-bottom:15px; transition: all 0.3s; }
+input, select { width:100%; padding:10px; border:1px solid #ccc; border-radius:10px; outline:none; font-size:14px; margin-bottom:15px; transition:all 0.3s; }
 input:focus, select:focus { border-color:#3f51b5; box-shadow:0 0 6px rgba(63,81,181,0.5); }
 .btn { display:inline-block; background:linear-gradient(90deg,#3f51b5,#2196f3); color:#fff; border:none; border-radius:10px; padding:12px 20px; font-size:14px; font-weight:600; cursor:pointer; margin:10px 5px 0 0; transition: all 0.3s; }
 .btn:hover { transform: scale(1.07); box-shadow: 0 4px 12px rgba(0,0,0,0.2);}
@@ -19,6 +19,7 @@ input:focus, select:focus { border-color:#3f51b5; box-shadow:0 0 6px rgba(63,81,
 .active-page { display:block; }
 .q-card { background:#f8f9ff; padding:15px; border-radius:12px; margin-bottom:15px; border:1px solid #ddd; }
 .thankyou { text-align:center; color:#2196f3; font-size:22px; font-weight:700; margin-top:20px; }
+.result-box { margin-top:15px; padding:10px; background:#e3f2fd; border-radius:10px; border:1px solid #90caf9; font-weight:600; text-align:center;}
 </style>
 </head>
 <body>
@@ -27,20 +28,23 @@ input:focus, select:focus { border-color:#3f51b5; box-shadow:0 0 6px rgba(63,81,
 <h2>Faculty Self-Evaluation Form – Chartered Accountancy Educators</h2>
 
 <!-- ================= PAGE 1: BASIC INFO ================= -->
-<div class="form-page active" id="page1">
-  <h2 class="text-lg font-semibold mb-4">Basic Information</h2>
+<div class="form-page active-page" id="page1">
+  <h2>Basic Information</h2>
 
-  <!-- Student Name -->
-  <input name="studentName" id="studentName" placeholder="Student Name" 
-         class="w-full border p-2 rounded mb-2" required>
+  <label>Faculty Name *</label>
+  <input id="facultyName" placeholder="Faculty Name" required>
 
-  <!-- Registration Number -->
-  <input name="regNumber" id="regNumber" placeholder="Registration Number" 
-         class="w-full border p-2 rounded mb-2" required>
+  <label>Registration Number *</label>
+  <input id="regNumber" placeholder="Registration Number" required>
 
-  <!-- Region Dropdown -->
-  <label for="region" class="block font-medium mt-2">Select Region</label>
-  <select id="region" name="region" class="w-full border p-2 rounded mb-2" required>
+  <label>Mobile Number *</label>
+  <input id="mobileNo" placeholder="Mobile Number" required>
+
+  <label>Email *</label>
+  <input id="email" placeholder="Email" required>
+
+  <label>Select Region *</label>
+  <select id="region" required>
     <option value="">-- Select Region --</option>
     <option value="CIRC">CIRC</option>
     <option value="NIRC">NIRC</option>
@@ -49,71 +53,27 @@ input:focus, select:focus { border-color:#3f51b5; box-shadow:0 0 6px rgba(63,81,
     <option value="WIRC">WIRC</option>
   </select>
 
-  <!-- Branch Dropdown -->
-  <label for="branch" class="block font-medium mt-2">Select Branch</label>
-  <select id="branch" name="branch" class="w-full border p-2 rounded mb-2" required>
+  <label>Select Branch *</label>
+  <select id="branch" required>
     <option value="">-- Select Branch --</option>
   </select>
+
+  <button class="btn" type="button" onclick="downloadTemplate()">Download Excel Template 📄</button>
+
+  <label>Upload Student SRN Excel (S.NO, SRN, TITLE, NAME) *</label>
+  <input type="file" id="excelFile" accept=".xlsx,.xls" required>
+
+  <div style="text-align:right;">
+    <button class="btn" onclick="goToSRN()">Next →</button>
+  </div>
 </div>
 
-<script>
-  // Region -> Branches mapping
-  const regionBranches = {
-    "CIRC": [
-      "Agra","Ajmer","Aligarh","Alwar","Bareilly","Beawar","Bhagalpur","Bharatpur","Bhilwara",
-      "Bhopal","Bikaner","Bilaspur","Bulandshahr","Chittorgarh","Darbhanga","Dehradun","Dhanbad",
-      "Gautam Budh Nagar","Ghaziabad","Gorakhpur","Gwalior","Haldwani","Hanumangarh","Haridwar",
-      "Bhilai","Indore","Jabalpur","Jaipur","Jamshedpur","Jhansi","Jodhpur","Kishangarh","Kota",
-      "Lucknow","Mandsaur","Mathura","Meerut","Moradabad","Muzaffarnagar","Muzaffarpur","Neemuch",
-      "Pali","Patna","Prayagraj","Raigarh","Raipur","Rajsamand","Ranchi","Ratlam","Saharanpur",
-      "Satna","Sikar","Sriganganagar","Tonk","Udaipur","Ujjain","Varanasi"
-    ],
-    "EIRC": [
-      "Asansol","Bhubaneswar","Brahmapur","Cuttack","Dibrugarh","Durgapur","Eirc","Guwahati",
-      "Jharsuguda","Raniganj","Rourkela","Sambalpur","Siliguri","Tinsukia"
-    ],
-    "NIRC": [
-      "Ambala","Amritsar","Bahadurgarh","Bathinda","Bhiwani","Chandigarh","Faridabad","Gurugram",
-      "Himachal Pradesh","Hisar","Jalandhar","Jammu And Kashmir","Kaithal","Karnal","Kurukshetra",
-      "Ludhiana","Mandi Gobindgarh","Panipat","Patiala","Rewari","Rohtak","Sangrur","Sirsa",
-      "Sonepat","Yamunanagar"
-    ],
-    "SIRC": [
-      "Alappuzha","Anantapur","Ballari","Belagavi","Bengaluru","Chengalpattu","Coimbatore",
-      "Ernakulam","Erode","Guntur","Hubballi","Hyderabad","Kadapa","Kakinada","Kalaburagi",
-      "Kannur","Karimnagar","Kollam","Kottayam","Kozhikode","Kumbakonam","Kurnool","Madurai",
-      "Mangaluru","Mysuru","Nellore","Ongole","Palakkad","Puducherry","Rajamahendravaram","Salem",
-      "Sivakasi","Thiruvananthapuram","Thoothukudi","Thrissur","Tiruchirapalli","Tirunelveli",
-      "Tirupati","Tirupur","Udupi","Vellore","Vijayawada","Visakhapatnam","Vizianagaram","Warangal",
-      "West Godavari"
-    ],
-    "WIRC": [
-      "Ahmedabad","Ahmednagar","Akola","Amravati","Anand","Bharuch","Bhavnagar","Bhuj",
-      "Chhatrapati Sambhajinagar (Aurangabad)","Dhule","Gandhidham","Gandhinagar","Goa",
-      "Ichalkaranji","Jalgaon","Jamnagar","Kalyan Dombivli","Kolhapur","Latur","Nagpur","Nanded",
-      "Nashik","Navi Mumbai","Navsari","Pimpri Chinchwad","Pune","Rajkot","Ratnagiri","Sangli",
-      "Satara","Solapur","Surat","Thane","Vadodara","Vapi","Vasai"
-    ]
-  };
-
-  // Populate branches when region changes
-  document.getElementById("region").addEventListener("change", function() {
-    const branchSelect = document.getElementById("branch");
-    branchSelect.innerHTML = '<option value="">-- Select Branch --</option>'; // reset
-
-    const selectedRegion = this.value;
-    if (regionBranches[selectedRegion]) {
-      regionBranches[selectedRegion].forEach(branch => {
-        const option = document.createElement("option");
-        option.value = branch;
-        option.textContent = branch;
-        branchSelect.appendChild(option);
-      });
-    }
-  });
-</script>
-<!-- Page 2: Select SRN -->
+<!-- ================= PAGE 2: SELECT SRN + DAY ================= -->
 <div id="page2" class="form-page">
+  <h2>Select Student & Day</h2>
+  <label>Select Day *</label>
+  <select id="dayDropdown"></select>
+
   <label>Select Student SRN *</label>
   <select id="srnDropdown"></select>
 
@@ -122,84 +82,130 @@ input:focus, select:focus { border-color:#3f51b5; box-shadow:0 0 6px rgba(63,81,
   </div>
 </div>
 
-<!-- Page 3: Feedback Questions -->
+<!-- ================= PAGE 3: FEEDBACK QUESTIONS ================= -->
 <div id="page3" class="form-page">
+  <h2>Feedback Questions</h2>
   <div id="questionsContainer"></div>
+  <div class="result-box" id="scoreBox">
+    Weightage Score: 0 | Grade: N/A
+  </div>
   <div style="text-align:right;">
     <button class="btn" onclick="submitFeedback()">Submit ✅</button>
   </div>
 </div>
 
-<!-- Page 4: Thank You -->
+<!-- ================= PAGE 4: THANK YOU ================= -->
 <div id="page4" class="form-page">
   <p class="thankyou">🎉 All feedback submitted successfully!</p>
 </div>
-
 </div>
 
 <script>
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxA3DQGfZaXgO6KkD6-aMBL9kVmGLqmOObN6kja1cA0iwBxSPZ0IJxFQHgWEzjxvS6ZEA/exec"; // ✅ Replace with deployed Apps Script URL
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxA3DQGfZaXgO6KkD6-aMBL9kVmGLqmOObN6kja1cA0iwBxSPZ0IJxFQHgWEzjxvS6ZEA/exec";
 
 let students = [];
 let completedSRNs = [];
+let completedDays = []; // store locked days
 let currentSRN = null;
+let currentDay = null;
 let facultyInfo = {};
+
+const regionBranches = {
+  "CIRC": ["Agra","Ajmer","Aligarh","Alwar","Bareilly","Beawar","Bhopal","Indore","Jaipur","Lucknow","Patna","Raipur","Ranchi","Udaipur","Varanasi"],
+  "EIRC": ["Asansol","Bhubaneswar","Cuttack","Dibrugarh","Durgapur","Guwahati","Kolkata","Rourkela","Siliguri"],
+  "NIRC": ["Ambala","Amritsar","Chandigarh","Delhi","Faridabad","Gurugram","Jammu","Ludhiana","Panipat"],
+  "SIRC": ["Bengaluru","Chennai","Coimbatore","Hyderabad","Kochi","Madurai","Mangalore","Thiruvananthapuram","Vijayawada","Visakhapatnam"],
+  "WIRC": ["Ahmedabad","Aurangabad","Goa","Kolhapur","Mumbai","Nagpur","Nashik","Pune","Rajkot","Surat","Vadodara"]
+};
 
 const questions = [
   "Subject Knowledge","Session Planning","Communication Skills","Engagement & Interaction",
   "Innovative Methods","Time Management","Adherence to Guidelines","Response to Questions",
   "Practical Examples","Professional Conduct","Use of Technology","Classroom Discipline",
-  "Student Feedback","Contribution to Growth","Overall Impact","Mindset Transformation Facilitation",
-  "Student-Centric Approach","Feedback Incorporation","Contribution to Faculty Development",
-  "Ethical Leadership & Role Modelling"
+  "Student Feedback","Contribution to Growth","Overall Impact","Mindset Transformation",
+  "Student-Centric Approach","Feedback Incorporation","Faculty Development Contribution","Ethical Leadership"
 ];
 
-// 📥 Download template
-function downloadTemplate(){
-  const ws_data=[["S.No","SRN","Name"],["1","SRN001","John Doe"]];
-  const ws=XLSX.utils.aoa_to_sheet(ws_data);
-  const wb=XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb,ws,"Template");
-  XLSX.writeFile(wb,"StudentTemplate.xlsx");
-}
+// region -> branch
+document.getElementById("region").addEventListener("change", function() {
+  const branchSelect = document.getElementById("branch");
+  branchSelect.innerHTML = '<option value="">-- Select Branch --</option>';
+  if(regionBranches[this.value]){
+    regionBranches[this.value].forEach(b=>{
+      const opt=document.createElement("option");
+      opt.value=b; opt.textContent=b;
+      branchSelect.appendChild(opt);
+    });
+  }
+});
 
-// 📤 Upload Excel
-function uploadExcel(event){
-  const file=event.target.files[0];
-  if(!file){ alert("⚠ Please select an Excel file"); return; }
-  const reader=new FileReader();
-  reader.onload=(e)=>{
-    const data=new Uint8Array(e.target.result);
-    const workbook=XLSX.read(data,{type:"array"});
-    const sheet=workbook.Sheets[workbook.SheetNames[0]];
-    students=XLSX.utils.sheet_to_json(sheet);
-    if(students.length===0){ alert("⚠ Excel file is empty or invalid"); }
+// Excel upload
+document.getElementById("excelFile").addEventListener("change", handleFile, false);
+function handleFile(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const data = new Uint8Array(e.target.result);
+    const workbook = XLSX.read(data, { type: "array" });
+    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+    const rows = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
+    students = rows.slice(1).map(r => ({
+      SRN: r[1] ? r[1].toString().trim() : "",
+      Name: r[3] ? r[3].toString().trim() : ""
+    })).filter(s => s.SRN);
+    alert("✅ Excel loaded: " + students.length + " SRNs found");
   };
   reader.readAsArrayBuffer(file);
 }
 
-// 👉 Page navigation
+// Download template
+function downloadTemplate(){
+  const wb = XLSX.utils.book_new();
+  const ws_data = [["S.NO","SRN","TITLE","NAME"]];
+  const ws = XLSX.utils.aoa_to_sheet(ws_data);
+  XLSX.utils.book_append_sheet(wb, ws, "Template");
+  XLSX.writeFile(wb, "Student_SRN_Template.xlsx");
+}
+
+// page navigation
 function showPage(n){
   document.querySelectorAll(".form-page").forEach(p=>p.style.display="none");
   document.getElementById("page"+n).style.display="block";
 }
 
-// 👉 Go to SRN selection
+// Go to SRN + Day
 function goToSRN(){
   const name=document.getElementById("facultyName").value.trim();
   const reg=document.getElementById("regNumber").value.trim();
   const mobile=document.getElementById("mobileNo").value.trim();
   const email=document.getElementById("email").value.trim();
+  const region=document.getElementById("region").value.trim();
+  const branch=document.getElementById("branch").value.trim();
+  const file=document.getElementById("excelFile").files[0];
 
-  if(!name||!reg||!mobile||!email){ alert("⚠ Please fill all fields"); return; }
-  if(students.length===0){ alert("⚠ Please upload student Excel file first"); return; }
-
-  facultyInfo={facultyName:name,regNumber:reg,mobileNo:mobile,email:email};
+  if(!name||!reg||!mobile||!email||!region||!branch||!file){
+    alert("⚠ Please fill all fields and upload Excel"); return;
+  }
+  facultyInfo={facultyName:name,regNumber:reg,mobileNo:mobile,email:email,region:region,branch:branch};
+  populateDayDropdown();
   updateSRNDropdown();
   showPage(2);
 }
 
-// 👉 Populate SRN dropdown excluding completed
+// populate day dropdown 1-15 and disable locked days
+function populateDayDropdown(){
+  const dayDropdown = document.getElementById("dayDropdown");
+  dayDropdown.innerHTML = '<option value="">-- Select Day --</option>';
+  for(let d=1; d<=15; d++){
+    const opt = document.createElement("option");
+    opt.value=d; opt.textContent="Day "+d;
+    if(completedDays.includes(d)) opt.disabled = true;
+    dayDropdown.appendChild(opt);
+  }
+}
+
+// update SRN dropdown
 function updateSRNDropdown(){
   const dropdown=document.getElementById("srnDropdown");
   dropdown.innerHTML="";
@@ -210,16 +216,18 @@ function updateSRNDropdown(){
   });
 }
 
-// 👉 Go to Feedback Questions
 function goToQuestions(){
   const dropdown=document.getElementById("srnDropdown");
+  const dayDropdown=document.getElementById("dayDropdown");
   if(!dropdown.value){ alert("⚠ Please select SRN"); return; }
+  if(!dayDropdown.value){ alert("⚠ Please select Day"); return; }
   currentSRN=dropdown.value;
+  currentDay=parseInt(dayDropdown.value);
   loadQuestions();
   showPage(3);
 }
 
-// 👉 Load questions
+// load questions
 function loadQuestions(){
   const container=document.getElementById("questionsContainer");
   container.innerHTML="";
@@ -227,7 +235,7 @@ function loadQuestions(){
     container.innerHTML+=`
       <div class="q-card">
         <label>${q}</label>
-        <select name="q${i}">
+        <select name="q${i}" onchange="updateScore()">
           <option value="">-- Select --</option>
           <option value="1">Poor</option>
           <option value="2">Below Average</option>
@@ -237,50 +245,65 @@ function loadQuestions(){
         </select>
       </div>`;
   });
+  updateScore();
 }
 
-// ✅ Submit feedback with FormData
+// calculate weightage & grade live
+function updateScore(){
+  let total = 0;
+  questions.forEach((q,i)=>{
+    const val = parseInt(document.querySelector(`select[name="q${i}"]`).value) || 0;
+    total += val;
+  });
+  let grade = "N/A";
+  if(total >= 90) grade = "A+";
+  else if(total >= 80) grade = "A";
+  else if(total >= 70) grade = "B+";
+  else if(total >= 60) grade = "B";
+  else if(total >= 50) grade = "C";
+  else grade = "D";
+  document.getElementById("scoreBox").textContent = `Weightage Score: ${total} | Grade: ${grade}`;
+}
+
+// submit feedback
 async function submitFeedback(){
   const ratings=[];
   questions.forEach((q,i)=>{
     const sel=document.querySelector(`select[name="q${i}"]`);
-    ratings.push(sel.value || "");
+    ratings.push(sel.value||"0");
   });
 
-  const payload = {
-    facultyName: facultyInfo.facultyName,
-    mobile: facultyInfo.mobileNo,
-    email: facultyInfo.email,
-    batchId: "",
-    region: "",
-    branch: "",
-    day: new Date().toLocaleDateString(),
-    srn: currentSRN,
-    score: "",
-    grade: ""
-  };
+  const total = ratings.reduce((a,b)=>a+parseInt(b),0);
+  let grade = "N/A";
+  if(total >= 90) grade = "A+";
+  else if(total >= 80) grade = "A";
+  else if(total >= 70) grade = "B+";
+  else if(total >= 60) grade = "B";
+  else if(total >= 50) grade = "C";
+  else grade = "D";
 
-  ratings.forEach((val,i)=>{
-    payload[`Q${i+1}`] = val;
-  });
+  const payload={...facultyInfo,date:new Date().toLocaleDateString(),srn:currentSRN,day:currentDay,totalScore:total,grade:grade};
+  ratings.forEach((val,i)=>{ payload[`Q${i+1}`]=val; });
 
   try{
-    const res = await fetch("https://script.google.com/macros/s/AKfycbxA3DQGfZaXgO6KkD6-aMBL9kVmGLqmOObN6kja1cA0iwBxSPZ0IJxFQHgWEzjxvS6ZEA/exec", {
+    const res=await fetch("https://script.google.com/macros/s/AKfycbxA3DQGfZaXgO6KkD6-aMBL9kVmGLqmOObN6kja1cA0iwBxSPZ0IJxFQHgWEzjxvS6ZEA/exec",{
       method:"POST",
-      body: JSON.stringify(payload),
-      headers: { "Content-Type": "application/json" }
+      body:JSON.stringify(payload),
+      headers:{"Content-Type":"application/json"}
     });
-    const result = await res.json();
-
-    if(result.result === "success"){
-      alert("✅ Feedback submitted successfully");
+    const result=await res.json();
+    if(result.result==="success"){
+      alert("✅ Feedback submitted");
       completedSRNs.push(currentSRN);
-      updateSRNDropdown();
-      if(completedSRNs.length===students.length){ 
-        showPage(4); 
-      } else { 
-        showPage(2); 
+
+      // Check if all students for the day are completed
+      if(completedSRNs.length===students.length){
+        if(!completedDays.includes(currentDay)) completedDays.push(currentDay);
       }
+
+      populateDayDropdown();
+      updateSRNDropdown();
+      if(completedSRNs.length===students.length){showPage(4);}else{showPage(2);}
     }else{
       alert("⚠ Error: "+(result.message||"Unable to submit feedback"));
     }
@@ -292,4 +315,3 @@ async function submitFeedback(){
 </script>
 </body>
 </html>
-
