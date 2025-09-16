@@ -45,7 +45,7 @@
       margin: 8px 0 5px;
       color: #333;
     }
-    input, textarea, select {
+    input, select {
       width: 100%;
       padding: 10px;
       border: 1px solid #ccc;
@@ -55,7 +55,7 @@
       margin-bottom: 15px;
       transition: all 0.3s;
     }
-    input:focus, textarea:focus, select:focus {
+    input:focus, select:focus {
       border-color: #3f51b5;
       box-shadow: 0 0 6px rgba(63,81,181,0.5);
     }
@@ -99,112 +99,96 @@
 </head>
 <body>
 
-  <div class="container">
+<div class="container">
 
-    <h1>THE INSTITUTE OF CHARTERED ACCOUNTANTS OF INDIA</h1>
-    <h2>Faculty Self-Evaluation Form – Chartered Accountancy Educators</h2>
+  <h1>THE INSTITUTE OF CHARTERED ACCOUNTANTS OF INDIA</h1>
+  <h2>Faculty Self-Evaluation Form – Chartered Accountancy Educators</h2>
 
-    <!-- Page 0 (Upload Excel + SRN selection) -->
-    <div id="page0" class="form-page active-page">
-      <label>📥 Download Template</label>
-      <button class="btn" onclick="downloadTemplate()">Download Excel Template</button>
+  <!-- Page 1: Basic Information -->
+  <div id="page1" class="form-page active-page">
+    <label>Faculty Name *</label>
+    <input type="text" id="facultyName" placeholder="Enter your name" required>
 
-      <label>📤 Upload Student Excel</label>
-      <input type="file" id="excelFile" accept=".xlsx" onchange="uploadExcel(event)">
+    <label>Registration Number *</label>
+    <input type="text" id="regNumber" placeholder="Enter registration number" required>
 
-      <label>Select SRN for Feedback *</label>
-      <select id="srnDropdown"></select>
+    <label>Mobile No *</label>
+    <input type="text" id="mobileNo" placeholder="Enter mobile number" required>
 
-      <div style="text-align:right;">
-        <button type="button" class="btn" onclick="startFeedback()">Start →</button>
-      </div>
+    <label>Email ID *</label>
+    <input type="email" id="email" placeholder="Enter email address" required>
+
+    <div style="text-align:right;">
+      <button class="btn" onclick="goToQuestions()">Next →</button>
     </div>
-
-    <!-- Page 1 (Feedback Questions) -->
-    <div id="page1" class="form-page">
-      <div id="questionsContainer"></div>
-      <div style="text-align:right;">
-        <button type="button" class="btn" onclick="submitFeedback()">Submit ✅</button>
-      </div>
-    </div>
-
-    <!-- Page 2 (Thank You / Next SRN) -->
-    <div id="page2" class="form-page">
-      <p class="thankyou">🎉 Feedback submitted successfully!</p>
-      <button class="btn" onclick="nextStudent()">➡ Next Student</button>
-    </div>
-
   </div>
 
+  <!-- Page 2: Feedback Questions -->
+  <div id="page2" class="form-page">
+    <div id="questionsContainer"></div>
+    <div style="text-align:right;">
+      <button class="btn" onclick="submitFeedback()">Submit ✅</button>
+    </div>
+  </div>
+
+  <!-- Page 3: Thank You / Next Student -->
+  <div id="page3" class="form-page">
+    <p class="thankyou">🎉 Feedback submitted successfully!</p>
+    <button class="btn" onclick="nextStudent()">➡ Next Student</button>
+  </div>
+
+</div>
+
 <script>
-let students = [];
-let currentSRN = null;
+let students = []; // Optional: Can be used if you upload an Excel
+let currentFaculty = {};
 
-// Download Excel template
-function downloadTemplate() {
-  const ws_data = [["S.No", "SRN", "Name"], ["1", "SRN001", "John Doe"]];
-  const ws = XLSX.utils.aoa_to_sheet(ws_data);
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "Template");
-  XLSX.writeFile(wb, "StudentTemplate.xlsx");
-}
+// All feedback questions
+const questions = [
+  "Subject Knowledge",
+  "Session Planning",
+  "Communication Skills",
+  "Engagement & Interaction",
+  "Innovative Methods",
+  "Time Management",
+  "Adherence to Guidelines",
+  "Response to Questions",
+  "Practical Examples",
+  "Professional Conduct",
+  "Use of Technology",
+  "Classroom Discipline",
+  "Student Feedback",
+  "Contribution to Growth",
+  "Overall Impact",
+  "Mindset Transformation Facilitation",
+  "Student-Centric Approach",
+  "Feedback Incorporation",
+  "Contribution to Faculty Development",
+  "Ethical Leadership & Role Modelling"
+];
 
-// Upload Excel
-function uploadExcel(event) {
-  const file = event.target.files[0];
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    const data = new Uint8Array(e.target.result);
-    const workbook = XLSX.read(data, { type: "array" });
-    const sheet = workbook.Sheets[workbook.SheetNames[0]];
-    students = XLSX.utils.sheet_to_json(sheet);
+// Go to Feedback Questions Page
+function goToQuestions() {
+  const name = document.getElementById("facultyName").value.trim();
+  const reg = document.getElementById("regNumber").value.trim();
+  const mobile = document.getElementById("mobileNo").value.trim();
+  const email = document.getElementById("email").value.trim();
 
-    let dropdown = document.getElementById("srnDropdown");
-    dropdown.innerHTML = "";
-    students.forEach(s => {
-      if(s.SRN) dropdown.innerHTML += `<option value="${s.SRN}">${s.SRN} - ${s.Name}</option>`;
-    });
-  };
-  reader.readAsArrayBuffer(file);
-}
+  if(!name || !reg || !mobile || !email) {
+    alert("⚠ Please fill all basic information fields.");
+    return;
+  }
 
-// Start feedback
-function startFeedback() {
-  const dropdown = document.getElementById("srnDropdown");
-  if(!dropdown.value) { alert("⚠ Please select an SRN"); return; }
-  currentSRN = dropdown.value;
+  currentFaculty = { facultyName: name, regNumber: reg, mobileNo: mobile, email: email };
+
   loadQuestions();
-  showPage(1);
+  showPage(2);
 }
 
-// Load questions
+// Load feedback questions
 function loadQuestions() {
   const container = document.getElementById("questionsContainer");
   container.innerHTML = "";
-
-  const questions = [
-    "Subject Knowledge",
-    "Session Planning",
-    "Communication Skills",
-    "Engagement & Interaction",
-    "Innovative Methods",
-    "Time Management",
-    "Adherence to Guidelines",
-    "Response to Questions",
-    "Practical Examples",
-    "Professional Conduct",
-    "Use of Technology",
-    "Classroom Discipline",
-    "Student Feedback",
-    "Contribution to Growth",
-    "Overall Impact",
-    "Mindset Transformation Facilitation",
-    "Student-Centric Approach",
-    "Feedback Incorporation",
-    "Contribution to Faculty Development",
-    "Ethical Leadership & Role Modelling"
-  ];
-
   questions.forEach((q, i) => {
     container.innerHTML += `
       <div class="q-card">
@@ -220,33 +204,33 @@ function loadQuestions() {
 
 // Submit feedback
 function submitFeedback() {
-  // All questions are optional now, so we don't validate
-  // mark SRN as completed
-  students = students.filter(s => s.SRN !== currentSRN);
-  showPage(2);
+  const feedback = {};
+  questions.forEach((q,i) => {
+    const selected = document.querySelector(`input[name="q${i}"]:checked`);
+    feedback[q] = selected ? selected.value : ""; // optional questions
+  });
+
+  currentFaculty.feedback = feedback;
+  console.log("Saved Faculty Feedback:", currentFaculty); // You can send to server/Google Sheet
+  showPage(3);
 }
 
 // Next student
 function nextStudent() {
-  if(students.length === 0){
-    alert("✅ All student feedback completed!");
-    showPage(0);
-    document.getElementById("srnDropdown").innerHTML = "";
-    return;
-  }
-  let dropdown = document.getElementById("srnDropdown");
-  dropdown.innerHTML = "";
-  students.forEach(s => {
-    if(s.SRN) dropdown.innerHTML += `<option value="${s.SRN}">${s.SRN} - ${s.Name}</option>`;
-  });
-  showPage(0);
+  // Reset the form
+  document.getElementById("facultyName").value = "";
+  document.getElementById("regNumber").value = "";
+  document.getElementById("mobileNo").value = "";
+  document.getElementById("email").value = "";
+  showPage(1);
 }
 
-// Show page
+// Show specific page
 function showPage(n) {
   document.querySelectorAll(".form-page").forEach(p => p.style.display = "none");
   document.getElementById("page"+n).style.display = "block";
 }
 </script>
+
 </body>
 </html>
