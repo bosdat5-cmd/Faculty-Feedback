@@ -28,12 +28,6 @@ input:focus, select:focus { border-color:#3f51b5; box-shadow:0 0 6px rgba(63,81,
 
 <!-- Page 1: Basic Info + Excel Upload -->
 <div id="page1" class="form-page active-page">
-  <label>📥 Download Excel Template</label>
-  <button class="btn" onclick="downloadTemplate()">Download Template</button>
-
-  <label>📤 Upload Student Excel</label>
-  <input type="file" id="excelFile" accept=".xlsx" onchange="uploadExcel(event)">
-
   <label>Faculty Name *</label>
   <input type="text" id="facultyName" placeholder="Enter your name" required>
 
@@ -45,6 +39,12 @@ input:focus, select:focus { border-color:#3f51b5; box-shadow:0 0 6px rgba(63,81,
 
   <label>Email ID *</label>
   <input type="email" id="email" placeholder="Enter email address" required>
+
+  <label>📥 Download Excel Template</label>
+  <button class="btn" onclick="downloadTemplate()">Download Template</button>
+
+  <label>📤 Upload Student Excel</label>
+  <input type="file" id="excelFile" accept=".xlsx" onchange="uploadExcel(event)">
 
   <div style="text-align:right;">
     <button class="btn" onclick="goToSRN()">Next →</button>
@@ -61,7 +61,7 @@ input:focus, select:focus { border-color:#3f51b5; box-shadow:0 0 6px rgba(63,81,
   </div>
 </div>
 
-<!-- Page 3: Feedback Questions (Dropdowns) -->
+<!-- Page 3: Feedback Questions -->
 <div id="page3" class="form-page">
   <div id="questionsContainer"></div>
   <div style="text-align:right;">
@@ -77,12 +77,13 @@ input:focus, select:focus { border-color:#3f51b5; box-shadow:0 0 6px rgba(63,81,
 </div>
 
 <script>
+const WEB_APP_URL = "https://script.google.com/macros/s/YOUR_DEPLOYED_WEB_APP_ID/exec"; // Replace with deployed Apps Script URL
+
 let students = [];
 let completedSRNs = [];
 let currentSRN = null;
 let facultyInfo = {};
 
-// All 20 questions
 const questions = [
   "Subject Knowledge","Session Planning","Communication Skills","Engagement & Interaction",
   "Innovative Methods","Time Management","Adherence to Guidelines","Response to Questions",
@@ -104,27 +105,28 @@ function downloadTemplate(){
 // Upload Excel
 function uploadExcel(event){
   const file=event.target.files[0];
-  if(!file) return;
+  if(!file){ alert("⚠ Please select an Excel file"); return; }
   const reader=new FileReader();
   reader.onload=(e)=>{
     const data=new Uint8Array(e.target.result);
     const workbook=XLSX.read(data,{type:"array"});
     const sheet=workbook.Sheets[workbook.SheetNames[0]];
     students=XLSX.utils.sheet_to_json(sheet);
+    if(students.length===0){ alert("⚠ Excel file is empty or invalid"); }
   };
   reader.readAsArrayBuffer(file);
 }
 
 // Go to SRN selection
 function goToSRN(){
-  // Save basic info
   const name=document.getElementById("facultyName").value.trim();
   const reg=document.getElementById("regNumber").value.trim();
   const mobile=document.getElementById("mobileNo").value.trim();
   const email=document.getElementById("email").value.trim();
   if(!name||!reg||!mobile||!email){ alert("⚠ Please fill all fields"); return; }
-  facultyInfo={facultyName:name,regNumber:reg,mobileNo:mobile,email:email};
+  if(students.length===0){ alert("⚠ Please upload student Excel file first"); return; }
 
+  facultyInfo={facultyName:name,regNumber:reg,mobileNo:mobile,email:email};
   updateSRNDropdown();
   showPage(2);
 }
@@ -167,22 +169,47 @@ function loadQuestions(){
   });
 }
 
-// Submit feedback for current SRN
-function submitFeedback(){
-  const feedback={};
+// Submit feedback
+async function submitFeedback(){
+  const ratings=[];
   questions.forEach((q,i)=>{
     const sel=document.querySelector(`select[name="q${i}"]`);
-    feedback[q]=sel.value || "";
+    ratings.push(sel.value || "");
   });
-  const student=students.find(s=>s.SRN===currentSRN);
-  student.feedback=feedback; // save feedback
-  completedSRNs.push(currentSRN);
 
-  updateSRNDropdown();
-  showPage(2);
+  const payload={
+    facultyName: facultyInfo.facultyName,
+    mobile: facultyInfo.mobileNo,
+    email: facultyInfo.email,
+    day: new Date().toLocaleDateString(),
+    srn: currentSRN,
+    ratings: ratings,
+    score: "",
+    grade: ""
+  };
+
+  try{
+    const res=await fetch("https://script.google.com/macros/s/AKfycbwbP9wvvLLHiz4sqC22xnUVDlxvDjNT8LVJyJGBFgXPYRrUp7RKPtEZOoEHzPwIzHI-VQ/exec",{
+      method:"POST",
+      body: JSON.stringify(payload),
+      headers:{ "Content-Type":"application/json" }
+    });
+    const result=await res.json();
+    if(result.status==="success"){
+      alert(result.message || "Feedback submitted successfully");
+      completedSRNs.push(currentSRN);
+      updateSRNDropdown();
+      if(completedSRNs.length===students.length){ showPage(4); } else { showPage(2); }
+    }else{
+      alert("Error: "+(result.message||"Unable to submit feedback"));
+    }
+  }catch(err){
+    console.error(err);
+    alert("Error submitting feedback: "+err.message);
+  }
 }
 
-// Show specific page
+// Show page
 function showPage(n){
   document.querySelectorAll(".form-page").forEach(p=>p.style.display="none");
   document.getElementById("page"+n).style.display="block";
