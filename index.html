@@ -1,236 +1,192 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Faculty Feedback Form</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  <style>
-    body {
-      font-family: 'Poppins', sans-serif;
-      background: #f5f7fb;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      justify-content: center;
-      min-height: 100vh;
-    }
-    .container {
-      background: #fff;
-      margin: 40px auto;
-      padding: 30px;
-      border-radius: 20px;
-      width: 700px;
-      box-shadow: 0 6px 25px rgba(0,0,0,0.15);
-    }
-    h1 {
-      text-align: center;
-      font-size: 26px;
-      font-weight: 700;
-      background: linear-gradient(90deg, #673ab7, #3f51b5, #2196f3);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      margin-bottom: 10px;
-    }
-    h2 {
-      text-align: center;
-      font-size: 18px;
-      font-weight: 600;
-      color: #444;
-      margin-bottom: 20px;
-    }
-    label {
-      font-weight: 500;
-      display: block;
-      margin: 8px 0 5px;
-      color: #333;
-    }
-    input, select {
-      width: 100%;
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 10px;
-      outline: none;
-      font-size: 14px;
-      margin-bottom: 15px;
-      transition: all 0.3s;
-    }
-    input:focus, select:focus {
-      border-color: #3f51b5;
-      box-shadow: 0 0 6px rgba(63,81,181,0.5);
-    }
-    .btn {
-      display: inline-block;
-      background: linear-gradient(90deg,#3f51b5,#2196f3);
-      color: #fff;
-      border: none;
-      border-radius: 10px;
-      padding: 12px 20px;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      margin: 10px 5px 0 0;
-      transition: all 0.3s;
-    }
-    .btn:hover {
-      transform: scale(1.07);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    }
-    .form-page { display: none; }
-    .active-page { display: block; }
-    .q-card {
-      background: #f8f9ff;
-      padding: 15px;
-      border-radius: 12px;
-      margin-bottom: 15px;
-      border: 1px solid #ddd;
-    }
-    .radio-option {
-      margin: 4px 0;
-    }
-    .thankyou {
-      text-align: center;
-      color: #2196f3;
-      font-size: 22px;
-      font-weight: 700;
-      margin-top: 20px;
-    }
-  </style>
+<meta charset="UTF-8">
+<title>Faculty Feedback Form</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+body { font-family: 'Poppins', sans-serif; background:#f5f7fb; margin:0; padding:0; display:flex; justify-content:center; min-height:100vh; }
+.container { background:#fff; margin:40px auto; padding:30px; border-radius:20px; width:700px; box-shadow:0 6px 25px rgba(0,0,0,0.15);}
+h1 { text-align:center; font-size:26px; font-weight:700; background:linear-gradient(90deg,#673ab7,#3f51b5,#2196f3); -webkit-background-clip:text; -webkit-text-fill-color:transparent; margin-bottom:10px; }
+h2 { text-align:center; font-size:18px; font-weight:600; color:#444; margin-bottom:20px; }
+label { font-weight:500; display:block; margin:8px 0 5px; color:#333; }
+input, select { width:100%; padding:10px; border:1px solid #ccc; border-radius:10px; outline:none; font-size:14px; margin-bottom:15px; transition: all 0.3s; }
+input:focus, select:focus { border-color:#3f51b5; box-shadow:0 0 6px rgba(63,81,181,0.5); }
+.btn { display:inline-block; background:linear-gradient(90deg,#3f51b5,#2196f3); color:#fff; border:none; border-radius:10px; padding:12px 20px; font-size:14px; font-weight:600; cursor:pointer; margin:10px 5px 0 0; transition: all 0.3s; }
+.btn:hover { transform: scale(1.07); box-shadow: 0 4px 12px rgba(0,0,0,0.2);}
+.form-page { display:none; }
+.active-page { display:block; }
+.q-card { background:#f8f9ff; padding:15px; border-radius:12px; margin-bottom:15px; border:1px solid #ddd; }
+.thankyou { text-align:center; color:#2196f3; font-size:22px; font-weight:700; margin-top:20px; }
+</style>
 </head>
 <body>
-
 <div class="container">
+<h1>THE INSTITUTE OF CHARTERED ACCOUNTANTS OF INDIA</h1>
+<h2>Faculty Self-Evaluation Form – Chartered Accountancy Educators</h2>
 
-  <h1>THE INSTITUTE OF CHARTERED ACCOUNTANTS OF INDIA</h1>
-  <h2>Faculty Self-Evaluation Form – Chartered Accountancy Educators</h2>
+<!-- Page 1: Basic Info + Excel Upload -->
+<div id="page1" class="form-page active-page">
+  <label>📥 Download Excel Template</label>
+  <button class="btn" onclick="downloadTemplate()">Download Template</button>
 
-  <!-- Page 1: Basic Information -->
-  <div id="page1" class="form-page active-page">
-    <label>Faculty Name *</label>
-    <input type="text" id="facultyName" placeholder="Enter your name" required>
+  <label>📤 Upload Student Excel</label>
+  <input type="file" id="excelFile" accept=".xlsx" onchange="uploadExcel(event)">
 
-    <label>Registration Number *</label>
-    <input type="text" id="regNumber" placeholder="Enter registration number" required>
+  <label>Faculty Name *</label>
+  <input type="text" id="facultyName" placeholder="Enter your name" required>
 
-    <label>Mobile No *</label>
-    <input type="text" id="mobileNo" placeholder="Enter mobile number" required>
+  <label>Registration Number *</label>
+  <input type="text" id="regNumber" placeholder="Enter registration number" required>
 
-    <label>Email ID *</label>
-    <input type="email" id="email" placeholder="Enter email address" required>
+  <label>Mobile No *</label>
+  <input type="text" id="mobileNo" placeholder="Enter mobile number" required>
 
-    <div style="text-align:right;">
-      <button class="btn" onclick="goToQuestions()">Next →</button>
-    </div>
+  <label>Email ID *</label>
+  <input type="email" id="email" placeholder="Enter email address" required>
+
+  <div style="text-align:right;">
+    <button class="btn" onclick="goToSRN()">Next →</button>
   </div>
+</div>
 
-  <!-- Page 2: Feedback Questions -->
-  <div id="page2" class="form-page">
-    <div id="questionsContainer"></div>
-    <div style="text-align:right;">
-      <button class="btn" onclick="submitFeedback()">Submit ✅</button>
-    </div>
-  </div>
+<!-- Page 2: Select SRN -->
+<div id="page2" class="form-page">
+  <label>Select Student SRN *</label>
+  <select id="srnDropdown"></select>
 
-  <!-- Page 3: Thank You / Next Student -->
-  <div id="page3" class="form-page">
-    <p class="thankyou">🎉 Feedback submitted successfully!</p>
-    <button class="btn" onclick="nextStudent()">➡ Next Student</button>
+  <div style="text-align:right;">
+    <button class="btn" onclick="goToQuestions()">Next →</button>
   </div>
+</div>
+
+<!-- Page 3: Feedback Questions (Dropdowns) -->
+<div id="page3" class="form-page">
+  <div id="questionsContainer"></div>
+  <div style="text-align:right;">
+    <button class="btn" onclick="submitFeedback()">Submit ✅</button>
+  </div>
+</div>
+
+<!-- Page 4: Thank You -->
+<div id="page4" class="form-page">
+  <p class="thankyou">🎉 All feedback submitted successfully!</p>
+</div>
 
 </div>
 
 <script>
-let students = []; // Optional: Can be used if you upload an Excel
-let currentFaculty = {};
+let students = [];
+let completedSRNs = [];
+let currentSRN = null;
+let facultyInfo = {};
 
-// All feedback questions
+// All 20 questions
 const questions = [
-  "Subject Knowledge",
-  "Session Planning",
-  "Communication Skills",
-  "Engagement & Interaction",
-  "Innovative Methods",
-  "Time Management",
-  "Adherence to Guidelines",
-  "Response to Questions",
-  "Practical Examples",
-  "Professional Conduct",
-  "Use of Technology",
-  "Classroom Discipline",
-  "Student Feedback",
-  "Contribution to Growth",
-  "Overall Impact",
-  "Mindset Transformation Facilitation",
-  "Student-Centric Approach",
-  "Feedback Incorporation",
-  "Contribution to Faculty Development",
+  "Subject Knowledge","Session Planning","Communication Skills","Engagement & Interaction",
+  "Innovative Methods","Time Management","Adherence to Guidelines","Response to Questions",
+  "Practical Examples","Professional Conduct","Use of Technology","Classroom Discipline",
+  "Student Feedback","Contribution to Growth","Overall Impact","Mindset Transformation Facilitation",
+  "Student-Centric Approach","Feedback Incorporation","Contribution to Faculty Development",
   "Ethical Leadership & Role Modelling"
 ];
 
-// Go to Feedback Questions Page
-function goToQuestions() {
-  const name = document.getElementById("facultyName").value.trim();
-  const reg = document.getElementById("regNumber").value.trim();
-  const mobile = document.getElementById("mobileNo").value.trim();
-  const email = document.getElementById("email").value.trim();
+// Download template
+function downloadTemplate(){
+  const ws_data=[["S.No","SRN","Name"],["1","SRN001","John Doe"]];
+  const ws=XLSX.utils.aoa_to_sheet(ws_data);
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,"Template");
+  XLSX.writeFile(wb,"StudentTemplate.xlsx");
+}
 
-  if(!name || !reg || !mobile || !email) {
-    alert("⚠ Please fill all basic information fields.");
-    return;
-  }
+// Upload Excel
+function uploadExcel(event){
+  const file=event.target.files[0];
+  if(!file) return;
+  const reader=new FileReader();
+  reader.onload=(e)=>{
+    const data=new Uint8Array(e.target.result);
+    const workbook=XLSX.read(data,{type:"array"});
+    const sheet=workbook.Sheets[workbook.SheetNames[0]];
+    students=XLSX.utils.sheet_to_json(sheet);
+  };
+  reader.readAsArrayBuffer(file);
+}
 
-  currentFaculty = { facultyName: name, regNumber: reg, mobileNo: mobile, email: email };
+// Go to SRN selection
+function goToSRN(){
+  // Save basic info
+  const name=document.getElementById("facultyName").value.trim();
+  const reg=document.getElementById("regNumber").value.trim();
+  const mobile=document.getElementById("mobileNo").value.trim();
+  const email=document.getElementById("email").value.trim();
+  if(!name||!reg||!mobile||!email){ alert("⚠ Please fill all fields"); return; }
+  facultyInfo={facultyName:name,regNumber:reg,mobileNo:mobile,email:email};
 
-  loadQuestions();
+  updateSRNDropdown();
   showPage(2);
 }
 
-// Load feedback questions
-function loadQuestions() {
-  const container = document.getElementById("questionsContainer");
-  container.innerHTML = "";
-  questions.forEach((q, i) => {
-    container.innerHTML += `
+// Populate SRN dropdown excluding completed
+function updateSRNDropdown(){
+  const dropdown=document.getElementById("srnDropdown");
+  dropdown.innerHTML="";
+  const remaining=students.filter(s=>!completedSRNs.includes(s.SRN));
+  if(remaining.length===0){ showPage(4); return; }
+  remaining.forEach(s=>dropdown.innerHTML+=`<option value="${s.SRN}">${s.SRN} - ${s.Name}</option>`);
+}
+
+// Go to Feedback Questions
+function goToQuestions(){
+  const dropdown=document.getElementById("srnDropdown");
+  if(!dropdown.value){ alert("⚠ Please select SRN"); return; }
+  currentSRN=dropdown.value;
+  loadQuestions();
+  showPage(3);
+}
+
+// Load questions as dropdowns
+function loadQuestions(){
+  const container=document.getElementById("questionsContainer");
+  container.innerHTML="";
+  questions.forEach((q,i)=>{
+    container.innerHTML+=`
       <div class="q-card">
         <label>${q}</label>
-        <div class="radio-option"><input type="radio" name="q${i}" value="1"> Poor</div>
-        <div class="radio-option"><input type="radio" name="q${i}" value="2"> Below Average</div>
-        <div class="radio-option"><input type="radio" name="q${i}" value="3"> Average</div>
-        <div class="radio-option"><input type="radio" name="q${i}" value="4"> Good</div>
-        <div class="radio-option"><input type="radio" name="q${i}" value="5"> Excellent</div>
+        <select name="q${i}">
+          <option value="">-- Select --</option>
+          <option value="1">Poor</option>
+          <option value="2">Below Average</option>
+          <option value="3">Average</option>
+          <option value="4">Good</option>
+          <option value="5">Excellent</option>
+        </select>
       </div>`;
   });
 }
 
-// Submit feedback
-function submitFeedback() {
-  const feedback = {};
-  questions.forEach((q,i) => {
-    const selected = document.querySelector(`input[name="q${i}"]:checked`);
-    feedback[q] = selected ? selected.value : ""; // optional questions
+// Submit feedback for current SRN
+function submitFeedback(){
+  const feedback={};
+  questions.forEach((q,i)=>{
+    const sel=document.querySelector(`select[name="q${i}"]`);
+    feedback[q]=sel.value || "";
   });
+  const student=students.find(s=>s.SRN===currentSRN);
+  student.feedback=feedback; // save feedback
+  completedSRNs.push(currentSRN);
 
-  currentFaculty.feedback = feedback;
-  console.log("Saved Faculty Feedback:", currentFaculty); // You can send to server/Google Sheet
-  showPage(3);
-}
-
-// Next student
-function nextStudent() {
-  // Reset the form
-  document.getElementById("facultyName").value = "";
-  document.getElementById("regNumber").value = "";
-  document.getElementById("mobileNo").value = "";
-  document.getElementById("email").value = "";
-  showPage(1);
+  updateSRNDropdown();
+  showPage(2);
 }
 
 // Show specific page
-function showPage(n) {
-  document.querySelectorAll(".form-page").forEach(p => p.style.display = "none");
-  document.getElementById("page"+n).style.display = "block";
+function showPage(n){
+  document.querySelectorAll(".form-page").forEach(p=>p.style.display="none");
+  document.getElementById("page"+n).style.display="block";
 }
 </script>
-
 </body>
 </html>
