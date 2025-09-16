@@ -77,7 +77,7 @@ input:focus, select:focus { border-color:#3f51b5; box-shadow:0 0 6px rgba(63,81,
 </div>
 
 <script>
-const WEB_APP_URL = "https://script.google.com/macros/s/YOUR_DEPLOYED_WEB_APP_ID/exec"; // Replace with deployed Apps Script URL
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxA3DQGfZaXgO6KkD6-aMBL9kVmGLqmOObN6kja1cA0iwBxSPZ0IJxFQHgWEzjxvS6ZEA/exec"; // ✅ Replace with deployed Apps Script URL
 
 let students = [];
 let completedSRNs = [];
@@ -93,7 +93,7 @@ const questions = [
   "Ethical Leadership & Role Modelling"
 ];
 
-// Download template
+// 📥 Download template
 function downloadTemplate(){
   const ws_data=[["S.No","SRN","Name"],["1","SRN001","John Doe"]];
   const ws=XLSX.utils.aoa_to_sheet(ws_data);
@@ -102,7 +102,7 @@ function downloadTemplate(){
   XLSX.writeFile(wb,"StudentTemplate.xlsx");
 }
 
-// Upload Excel
+// 📤 Upload Excel
 function uploadExcel(event){
   const file=event.target.files[0];
   if(!file){ alert("⚠ Please select an Excel file"); return; }
@@ -117,12 +117,19 @@ function uploadExcel(event){
   reader.readAsArrayBuffer(file);
 }
 
-// Go to SRN selection
+// 👉 Page navigation
+function showPage(n){
+  document.querySelectorAll(".form-page").forEach(p=>p.style.display="none");
+  document.getElementById("page"+n).style.display="block";
+}
+
+// 👉 Go to SRN selection
 function goToSRN(){
   const name=document.getElementById("facultyName").value.trim();
   const reg=document.getElementById("regNumber").value.trim();
   const mobile=document.getElementById("mobileNo").value.trim();
   const email=document.getElementById("email").value.trim();
+
   if(!name||!reg||!mobile||!email){ alert("⚠ Please fill all fields"); return; }
   if(students.length===0){ alert("⚠ Please upload student Excel file first"); return; }
 
@@ -131,16 +138,18 @@ function goToSRN(){
   showPage(2);
 }
 
-// Populate SRN dropdown excluding completed
+// 👉 Populate SRN dropdown excluding completed
 function updateSRNDropdown(){
   const dropdown=document.getElementById("srnDropdown");
   dropdown.innerHTML="";
   const remaining=students.filter(s=>!completedSRNs.includes(s.SRN));
   if(remaining.length===0){ showPage(4); return; }
-  remaining.forEach(s=>dropdown.innerHTML+=`<option value="${s.SRN}">${s.SRN} - ${s.Name}</option>`);
+  remaining.forEach(s=>{
+    dropdown.innerHTML+=`<option value="${s.SRN}">${s.SRN} - ${s.Name}</option>`;
+  });
 }
 
-// Go to Feedback Questions
+// 👉 Go to Feedback Questions
 function goToQuestions(){
   const dropdown=document.getElementById("srnDropdown");
   if(!dropdown.value){ alert("⚠ Please select SRN"); return; }
@@ -149,7 +158,7 @@ function goToQuestions(){
   showPage(3);
 }
 
-// Load questions as dropdowns
+// 👉 Load questions
 function loadQuestions(){
   const container=document.getElementById("questionsContainer");
   container.innerHTML="";
@@ -169,7 +178,7 @@ function loadQuestions(){
   });
 }
 
-// Submit feedback
+// ✅ Submit feedback with FormData
 async function submitFeedback(){
   const ratings=[];
   questions.forEach((q,i)=>{
@@ -177,44 +186,48 @@ async function submitFeedback(){
     ratings.push(sel.value || "");
   });
 
-  const payload={
+  const payload = {
     facultyName: facultyInfo.facultyName,
     mobile: facultyInfo.mobileNo,
     email: facultyInfo.email,
+    batchId: "",
+    region: "",
+    branch: "",
     day: new Date().toLocaleDateString(),
     srn: currentSRN,
-    ratings: ratings,
     score: "",
     grade: ""
   };
 
+  ratings.forEach((val,i)=>{
+    payload[`Q${i+1}`] = val;
+  });
+
   try{
-    const res=await fetch("https://script.google.com/macros/s/AKfycbwbP9wvvLLHiz4sqC22xnUVDlxvDjNT8LVJyJGBFgXPYRrUp7RKPtEZOoEHzPwIzHI-VQ/exec",{
+    const res = await fetch("https://script.google.com/macros/s/AKfycbxA3DQGfZaXgO6KkD6-aMBL9kVmGLqmOObN6kja1cA0iwBxSPZ0IJxFQHgWEzjxvS6ZEA/exec", {
       method:"POST",
       body: JSON.stringify(payload),
-      headers:{ "Content-Type":"application/json" }
+      headers: { "Content-Type": "application/json" }
     });
-    const result=await res.json();
-    if(result.status==="success"){
-      alert(result.message || "Feedback submitted successfully");
+    const result = await res.json();
+
+    if(result.result === "success"){
+      alert("✅ Feedback submitted successfully");
       completedSRNs.push(currentSRN);
       updateSRNDropdown();
-      if(completedSRNs.length===students.length){ showPage(4); } else { showPage(2); }
+      if(completedSRNs.length===students.length){ 
+        showPage(4); 
+      } else { 
+        showPage(2); 
+      }
     }else{
-      alert("Error: "+(result.message||"Unable to submit feedback"));
+      alert("⚠ Error: "+(result.message||"Unable to submit feedback"));
     }
   }catch(err){
     console.error(err);
     alert("Error submitting feedback: "+err.message);
   }
 }
-
-// Show page
-function showPage(n){
-  document.querySelectorAll(".form-page").forEach(p=>p.style.display="none");
-  document.getElementById("page"+n).style.display="block";
-}
 </script>
 </body>
 </html>
-
