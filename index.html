@@ -26,31 +26,92 @@ input:focus, select:focus { border-color:#3f51b5; box-shadow:0 0 6px rgba(63,81,
 <h1>THE INSTITUTE OF CHARTERED ACCOUNTANTS OF INDIA</h1>
 <h2>Faculty Self-Evaluation Form – Chartered Accountancy Educators</h2>
 
-<!-- Page 1: Basic Info + Excel Upload -->
-<div id="page1" class="form-page active-page">
-  <label>Faculty Name *</label>
-  <input type="text" id="facultyName" placeholder="Enter your name" required>
+<!-- ================= PAGE 1: BASIC INFO ================= -->
+<div class="form-page active" id="page1">
+  <h2 class="text-lg font-semibold mb-4">Basic Information</h2>
 
-  <label>Registration Number *</label>
-  <input type="text" id="regNumber" placeholder="Enter registration number" required>
+  <!-- Student Name -->
+  <input name="studentName" id="studentName" placeholder="Student Name" 
+         class="w-full border p-2 rounded mb-2" required>
 
-  <label>Mobile No *</label>
-  <input type="text" id="mobileNo" placeholder="Enter mobile number" required>
+  <!-- Registration Number -->
+  <input name="regNumber" id="regNumber" placeholder="Registration Number" 
+         class="w-full border p-2 rounded mb-2" required>
 
-  <label>Email ID *</label>
-  <input type="email" id="email" placeholder="Enter email address" required>
+  <!-- Region Dropdown -->
+  <label for="region" class="block font-medium mt-2">Select Region</label>
+  <select id="region" name="region" class="w-full border p-2 rounded mb-2" required>
+    <option value="">-- Select Region --</option>
+    <option value="CIRC">CIRC</option>
+    <option value="NIRC">NIRC</option>
+    <option value="EIRC">EIRC</option>
+    <option value="SIRC">SIRC</option>
+    <option value="WIRC">WIRC</option>
+  </select>
 
-  <label>📥 Download Excel Template</label>
-  <button class="btn" onclick="downloadTemplate()">Download Template</button>
-
-  <label>📤 Upload Student Excel</label>
-  <input type="file" id="excelFile" accept=".xlsx" onchange="uploadExcel(event)">
-
-  <div style="text-align:right;">
-    <button class="btn" onclick="goToSRN()">Next →</button>
-  </div>
+  <!-- Branch Dropdown -->
+  <label for="branch" class="block font-medium mt-2">Select Branch</label>
+  <select id="branch" name="branch" class="w-full border p-2 rounded mb-2" required>
+    <option value="">-- Select Branch --</option>
+  </select>
 </div>
 
+<script>
+  // Region -> Branches mapping
+  const regionBranches = {
+    "CIRC": [
+      "Agra","Ajmer","Aligarh","Alwar","Bareilly","Beawar","Bhagalpur","Bharatpur","Bhilwara",
+      "Bhopal","Bikaner","Bilaspur","Bulandshahr","Chittorgarh","Darbhanga","Dehradun","Dhanbad",
+      "Gautam Budh Nagar","Ghaziabad","Gorakhpur","Gwalior","Haldwani","Hanumangarh","Haridwar",
+      "Bhilai","Indore","Jabalpur","Jaipur","Jamshedpur","Jhansi","Jodhpur","Kishangarh","Kota",
+      "Lucknow","Mandsaur","Mathura","Meerut","Moradabad","Muzaffarnagar","Muzaffarpur","Neemuch",
+      "Pali","Patna","Prayagraj","Raigarh","Raipur","Rajsamand","Ranchi","Ratlam","Saharanpur",
+      "Satna","Sikar","Sriganganagar","Tonk","Udaipur","Ujjain","Varanasi"
+    ],
+    "EIRC": [
+      "Asansol","Bhubaneswar","Brahmapur","Cuttack","Dibrugarh","Durgapur","Eirc","Guwahati",
+      "Jharsuguda","Raniganj","Rourkela","Sambalpur","Siliguri","Tinsukia"
+    ],
+    "NIRC": [
+      "Ambala","Amritsar","Bahadurgarh","Bathinda","Bhiwani","Chandigarh","Faridabad","Gurugram",
+      "Himachal Pradesh","Hisar","Jalandhar","Jammu And Kashmir","Kaithal","Karnal","Kurukshetra",
+      "Ludhiana","Mandi Gobindgarh","Panipat","Patiala","Rewari","Rohtak","Sangrur","Sirsa",
+      "Sonepat","Yamunanagar"
+    ],
+    "SIRC": [
+      "Alappuzha","Anantapur","Ballari","Belagavi","Bengaluru","Chengalpattu","Coimbatore",
+      "Ernakulam","Erode","Guntur","Hubballi","Hyderabad","Kadapa","Kakinada","Kalaburagi",
+      "Kannur","Karimnagar","Kollam","Kottayam","Kozhikode","Kumbakonam","Kurnool","Madurai",
+      "Mangaluru","Mysuru","Nellore","Ongole","Palakkad","Puducherry","Rajamahendravaram","Salem",
+      "Sivakasi","Thiruvananthapuram","Thoothukudi","Thrissur","Tiruchirapalli","Tirunelveli",
+      "Tirupati","Tirupur","Udupi","Vellore","Vijayawada","Visakhapatnam","Vizianagaram","Warangal",
+      "West Godavari"
+    ],
+    "WIRC": [
+      "Ahmedabad","Ahmednagar","Akola","Amravati","Anand","Bharuch","Bhavnagar","Bhuj",
+      "Chhatrapati Sambhajinagar (Aurangabad)","Dhule","Gandhidham","Gandhinagar","Goa",
+      "Ichalkaranji","Jalgaon","Jamnagar","Kalyan Dombivli","Kolhapur","Latur","Nagpur","Nanded",
+      "Nashik","Navi Mumbai","Navsari","Pimpri Chinchwad","Pune","Rajkot","Ratnagiri","Sangli",
+      "Satara","Solapur","Surat","Thane","Vadodara","Vapi","Vasai"
+    ]
+  };
+
+  // Populate branches when region changes
+  document.getElementById("region").addEventListener("change", function() {
+    const branchSelect = document.getElementById("branch");
+    branchSelect.innerHTML = '<option value="">-- Select Branch --</option>'; // reset
+
+    const selectedRegion = this.value;
+    if (regionBranches[selectedRegion]) {
+      regionBranches[selectedRegion].forEach(branch => {
+        const option = document.createElement("option");
+        option.value = branch;
+        option.textContent = branch;
+        branchSelect.appendChild(option);
+      });
+    }
+  });
+</script>
 <!-- Page 2: Select SRN -->
 <div id="page2" class="form-page">
   <label>Select Student SRN *</label>
@@ -231,3 +292,4 @@ async function submitFeedback(){
 </script>
 </body>
 </html>
+
