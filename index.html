@@ -183,19 +183,32 @@ function loadQuestions() {
   container.innerHTML = "";
 
   const questions = [
-    "Attendance & Punctuality",
-    "Discipline",
-    "Active Participation",
-    "Teamwork & Collaboration",
-    "Presentation Skills",
-    "Teaching Style & Clarity",
-    "Interaction with Students"
+    "Subject Knowledge",
+    "Session Planning",
+    "Communication Skills",
+    "Engagement & Interaction",
+    "Innovative Methods",
+    "Time Management",
+    "Adherence to Guidelines",
+    "Response to Questions",
+    "Practical Examples",
+    "Professional Conduct",
+    "Use of Technology",
+    "Classroom Discipline",
+    "Student Feedback",
+    "Contribution to Growth",
+    "Overall Impact",
+    "Mindset Transformation Facilitation",
+    "Student-Centric Approach",
+    "Feedback Incorporation",
+    "Contribution to Faculty Development",
+    "Ethical Leadership & Role Modelling"
   ];
 
   questions.forEach((q, i) => {
     container.innerHTML += `
       <div class="q-card">
-        <label>${q} *</label>
+        <label>${q}</label>
         <div class="radio-option"><input type="radio" name="q${i}" value="1"> Poor</div>
         <div class="radio-option"><input type="radio" name="q${i}" value="2"> Below Average</div>
         <div class="radio-option"><input type="radio" name="q${i}" value="3"> Average</div>
@@ -207,11 +220,7 @@ function loadQuestions() {
 
 // Submit feedback
 function submitFeedback() {
-  let count = 7;
-  for (let i = 0; i < count; i++) {
-    const selected = document.querySelector('input[name="q'+i+'"]:checked');
-    if(!selected){ alert("⚠ Please answer all questions!"); return; }
-  }
+  // All questions are optional now, so we don't validate
   // mark SRN as completed
   students = students.filter(s => s.SRN !== currentSRN);
   showPage(2);
@@ -239,6 +248,5 @@ function showPage(n) {
   document.getElementById("page"+n).style.display = "block";
 }
 </script>
-
 </body>
 </html>
